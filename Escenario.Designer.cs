@@ -34,18 +34,20 @@
             // Visor
             // 
             Visor.BackColor = SystemColors.GradientInactiveCaption;
-            Visor.Location = new Point(21, 47);
+            Visor.Location = new Point(-1, -1);
+            Visor.Margin = new Padding(3, 2, 3, 2);
             Visor.Name = "Visor";
             Visor.Scene = null;
-            Visor.Size = new Size(800, 550);
+            Visor.Size = new Size(755, 494);
             Visor.TabIndex = 0;
             // 
             // Escenario
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(862, 653);
+            ClientSize = new Size(754, 490);
             Controls.Add(Visor);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "Escenario";
             Text = "Escenario";
             ResumeLayout(false);
