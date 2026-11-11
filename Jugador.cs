@@ -8,8 +8,8 @@ namespace PixelEsGUI
         // ---------- Constantes del salto ----------
         const double AnguloVertical = Math.PI / 2;   // 90°: salto recto
         const double AnguloParabolico = Math.PI / 3; // 60°: salto con desplazamiento lateral
-        const int Gravedad = 3;
-        const int FuerzaSaltoBase = 3;
+        const int Gravedad = 4;
+        const int FuerzaSaltoBase = 4;
         const double Tiempo = 0.25;                  // intervalo de simulación por fotograma
 
         // ---------- Hoja de sprites (Resources/jugador_sheet.png) ----------
@@ -70,21 +70,13 @@ namespace PixelEsGUI
         // y se recuerda la dirección para decidir el tipo de salto.
         public override bool MoverIzq()
         {
-            if (!EnElSuelo)
-            {
-                return false;
-            }
-            movimientoHorizontal = -1;
+            movimientoHorizontal = 3;
             return base.MoverIzq();
         }
 
         public override bool MoverDer()
         {
-            if (!EnElSuelo)
-            {
-                return false;
-            }
-            movimientoHorizontal = 1;
+            movimientoHorizontal = 3;
             return base.MoverDer();
         }
 
@@ -99,14 +91,11 @@ namespace PixelEsGUI
                 return;
             }
 
-            SaltoParabolico = movimientoHorizontal != 0;
-            angulo = SaltoParabolico ? AnguloParabolico : AnguloVertical;
-
+            // Calculamos únicamente la velocidad vertical inicial (Impulso en Y)
+            // Se usa AnguloVertical (o directamente la velocidad del salto) para el impulso vertical.
             double velInicial = VelSalto * FuerzaSalto;
-            velx = SaltoParabolico ? velInicial * Math.Cos(angulo) * movimientoHorizontal : 0;
-            VelY = velInicial * Math.Sin(angulo);
+            VelY = velInicial * Math.Sin(AnguloVertical);
 
-            origenX = X;
             sueloY = Y;
             tiempoVuelo = 0;
             EnElSuelo = false;
@@ -120,7 +109,7 @@ namespace PixelEsGUI
         {
             if (!EnElSuelo)
             {
-                double velInicialY = VelSalto * FuerzaSalto * Math.Sin(angulo);
+                double velInicialY = VelSalto * FuerzaSalto;
                 double duracionVuelo = 2 * velInicialY / Gravedad;
 
                 tiempoVuelo += Tiempo;
@@ -130,10 +119,12 @@ namespace PixelEsGUI
                     tiempoVuelo = duracionVuelo;
                 }
 
+                // Simulación de la parábola solo en el eje Y (respetando la X actual del jugador)
                 double altura = velInicialY * tiempoVuelo - 0.5 * Gravedad * tiempoVuelo * tiempoVuelo;
-                int nuevaX = (int)Math.Round(origenX + velx * tiempoVuelo);
                 int nuevaY = aterriza ? sueloY : (int)Math.Round(sueloY - altura);
-                SetPos(nuevaX, nuevaY);
+
+                // Se mantiene la X actual para no bloquear el control horizontal del jugador
+                SetPos(X, nuevaY);
 
                 if (aterriza)
                 {
@@ -148,10 +139,10 @@ namespace PixelEsGUI
                 }
             }
 
-            // Fin del fotograma: se elige el cuadro de animación según lo que pasó en él.
+            // Fin del fotograma: actualiza la animación según la dirección actual
             ActualizarAnimacion(movimientoHorizontal != 0);
 
-            // El movimiento lateral solo cuenta para el salto del mismo fotograma.
+            // Reiniciamos el registro de entrada horizontal del fotograma
             movimientoHorizontal = 0;
         }
 

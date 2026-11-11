@@ -14,7 +14,7 @@ namespace PixelEsGUI
 
         // ---------- Estado ----------
         public int Vida { get; protected set; } = 1;
-        public int Velocidad { get; set; } = 1;
+        public int Velocidad { get; set; } = 5;
         public int Dano { get; protected set; } = 1;
         public int Direccion { get; protected set; } = 1; // -1 izquierda, 1 derecha
         public bool EstaVivo => Vida > 0;

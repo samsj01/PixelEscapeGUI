@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Reference Include="Engine2D">
-      <HintPath>..\Engine2D.dll</HintPath>
+      <HintPath>Engine2D.dll</HintPath>
     </Reference>
   </ItemGroup>
 

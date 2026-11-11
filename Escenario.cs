@@ -6,6 +6,8 @@ namespace PixelEsGUI
     {
         GraphicsScene scene;
         Jugador jugador;
+        CazadorPixel cazador;
+        GuardianPixel guardian;
 
         // Teclas que están presionadas en este momento.
         bool izquierda, derecha, salto;
@@ -16,15 +18,23 @@ namespace PixelEsGUI
             
             InitializeComponent();
             StartPosition = FormStartPosition.CenterScreen;
-            scene = new GraphicsScene();
-            scene.Origin = CoordinateOrigin.TopLeft;
-            scene.BackgroundColor = Color.FromArgb(30,30,30);
+            scene = new GraphicsScene
+            {
+                Origin = CoordinateOrigin.TopLeft,
+                BackgroundColor = Color.FromArgb(30, 30, 30)
+            };
             scene.SetBackgroundImage("background");
             Visor.Scene = scene;
-            Visor.Size = new Size(800, 600);
+            Visor.Dock = DockStyle.Fill;
 
             jugador = new Jugador(100, 100);
             scene.AddItem(jugador);
+
+            guardian = new GuardianPixel(280, 120);
+            scene.AddItem(guardian);
+
+            cazador = new CazadorPixel(550, 120);
+            scene.AddItem(cazador);
 
             // Teclado: el formulario recibe las teclas antes que el visor.
             KeyPreview = true;
