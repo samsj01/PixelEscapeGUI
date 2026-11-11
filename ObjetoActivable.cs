@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Objeto que reacciona cuando el jugador lo activa (trampa, punto de control).
     internal abstract class ObjetoActivable : ObjetoInteractivo

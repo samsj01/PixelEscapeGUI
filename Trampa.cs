@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Clase concreta (no abstracta): se pueden crear trampas con new Trampa(...).
     // Causa daño al jugador cuando está en su misma posición X.

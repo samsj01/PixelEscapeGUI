@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PixelEsGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a5e1687470808383f367bdfdc3328b36e3a805bc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+10916b0101262733d324b80862764033da7182a9")]
 [assembly: System.Reflection.AssemblyProductAttribute("PixelEsGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PixelEsGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

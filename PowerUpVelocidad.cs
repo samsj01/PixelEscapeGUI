@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Aumenta la velocidad del jugador.
     internal class PowerUpVelocidad : PowerUpTemporal

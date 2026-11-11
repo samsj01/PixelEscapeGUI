@@ -3,6 +3,78 @@
   "WorkspaceRootPath": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\properties\\resources.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:properties\\resources.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\escenario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:escenario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\pixelesgui.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:pixelesgui.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\cazadorpixel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:cazadorpixel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\guardianpixel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:guardianpixel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\jugador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:jugador.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\personaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:personaje.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\trampa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:trampa.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\puntocontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:puntocontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\puerta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:puerta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\powerupvelocidad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:powerupvelocidad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\poweruptemporal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:poweruptemporal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\powerupescudo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:powerupescudo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\objetointeractivo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:objetointeractivo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\objetoactivable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:objetoactivable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\moneda.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:moneda.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\llave.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:llave.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\coleccionables.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:coleccionables.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|c:\\users\\samus\\documents\\poo\\pixelescapegui\\pixelescapegui\\escenario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{49A1C79F-B73E-7C9E-04D2-13C68F5902FE}|PixelEsGUI.csproj|solutionrelative:escenario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
@@ -19,6 +91,238 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Resources.resx",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Properties\\Resources.resx",
+              "RelativeDocumentMoniker": "Properties\\Resources.resx",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Properties\\Resources.resx",
+              "RelativeToolTip": "Properties\\Resources.resx",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2026-11-11T02:06:21.236Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PixelEsGUI",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PixelEsGUI.csproj",
+              "RelativeDocumentMoniker": "PixelEsGUI.csproj",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PixelEsGUI.csproj",
+              "RelativeToolTip": "PixelEsGUI.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-11-11T02:05:54.271Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Escenario.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Escenario.cs",
+              "RelativeDocumentMoniker": "Escenario.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Escenario.cs",
+              "RelativeToolTip": "Escenario.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:55:36.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Trampa.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Trampa.cs",
+              "RelativeDocumentMoniker": "Trampa.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Trampa.cs",
+              "RelativeToolTip": "Trampa.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:48:30.687Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "PuntoControl.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PuntoControl.cs",
+              "RelativeDocumentMoniker": "PuntoControl.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PuntoControl.cs",
+              "RelativeToolTip": "PuntoControl.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:48:25.472Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Puerta.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Puerta.cs",
+              "RelativeDocumentMoniker": "Puerta.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Puerta.cs",
+              "RelativeToolTip": "Puerta.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:48:20.05Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "PowerUpVelocidad.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpVelocidad.cs",
+              "RelativeDocumentMoniker": "PowerUpVelocidad.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpVelocidad.cs",
+              "RelativeToolTip": "PowerUpVelocidad.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:48:11.026Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "PowerUpTemporal.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpTemporal.cs",
+              "RelativeDocumentMoniker": "PowerUpTemporal.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpTemporal.cs",
+              "RelativeToolTip": "PowerUpTemporal.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:48:03.684Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Personaje.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Personaje.cs",
+              "RelativeDocumentMoniker": "Personaje.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Personaje.cs",
+              "RelativeToolTip": "Personaje.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABIAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:52.371Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Jugador.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Jugador.cs",
+              "RelativeDocumentMoniker": "Jugador.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Jugador.cs",
+              "RelativeToolTip": "Jugador.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAA4wB8AAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:11.459Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GuardianPixel.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\GuardianPixel.cs",
+              "RelativeDocumentMoniker": "GuardianPixel.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\GuardianPixel.cs",
+              "RelativeToolTip": "GuardianPixel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:06.419Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CazadorPixel.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\CazadorPixel.cs",
+              "RelativeDocumentMoniker": "CazadorPixel.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\CazadorPixel.cs",
+              "RelativeToolTip": "CazadorPixel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:46:42.606Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "PowerUpEscudo.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpEscudo.cs",
+              "RelativeDocumentMoniker": "PowerUpEscudo.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\PowerUpEscudo.cs",
+              "RelativeToolTip": "PowerUpEscudo.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:57.893Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ObjetoInteractivo.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\ObjetoInteractivo.cs",
+              "RelativeDocumentMoniker": "ObjetoInteractivo.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\ObjetoInteractivo.cs",
+              "RelativeToolTip": "ObjetoInteractivo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:40.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ObjetoActivable.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\ObjetoActivable.cs",
+              "RelativeDocumentMoniker": "ObjetoActivable.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\ObjetoActivable.cs",
+              "RelativeToolTip": "ObjetoActivable.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:31.271Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Moneda.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Moneda.cs",
+              "RelativeDocumentMoniker": "Moneda.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Moneda.cs",
+              "RelativeToolTip": "Moneda.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:23.491Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Llave.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Llave.cs",
+              "RelativeDocumentMoniker": "Llave.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Llave.cs",
+              "RelativeToolTip": "Llave.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:47:16.956Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "Coleccionables.cs",
+              "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Coleccionables.cs",
+              "RelativeDocumentMoniker": "Coleccionables.cs",
+              "ToolTip": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Coleccionables.cs",
+              "RelativeToolTip": "Coleccionables.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-11T01:46:57.238Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
               "Title": "Escenario.cs [Dise\u00F1o]",
               "DocumentMoniker": "C:\\Users\\samus\\Documents\\POO\\PixelEscapeGUI\\PixelEscapeGUI\\Escenario.cs",
               "RelativeDocumentMoniker": "Escenario.cs",

@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Base común de los power-ups que duran un tiempo.
     internal abstract class PowerUpTemporal : Coleccionables

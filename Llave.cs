@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Le da al jugador la llave que abre la puerta de salida.
     internal class Llave : Coleccionables

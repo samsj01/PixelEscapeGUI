@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Bloquea el paso del jugador.
     internal class Obstaculo

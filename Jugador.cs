@@ -1,6 +1,6 @@
 using System;
 
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Alex Pixel: el personaje que controla el usuario.
     internal class Jugador : Personaje
@@ -29,7 +29,7 @@ namespace PixelEscape
         public int FuerzaSalto => FuerzaSaltoBase;
         public double VelSalto { get; protected set; } = 5;
 
-        public Jugador(int x, int y) : base(x, y)
+        public Jugador(int x, int y) : base(x, y, "Jugador")
         {
             Vida = 3;
             Dano = 1;

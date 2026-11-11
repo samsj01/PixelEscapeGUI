@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Lugar al que regresa el jugador tras perder una vida.
     internal class PuntoControl : ObjetoActivable

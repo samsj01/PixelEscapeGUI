@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Base de los objetos del escenario con los que el jugador interactúa.
     internal abstract class ObjetoInteractivo

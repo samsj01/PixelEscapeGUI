@@ -1,8 +1,10 @@
-namespace PixelEscape
+using Engine2D;
+
+namespace PixelEsGUI
 {
     // Base de todos los personajes (jugador y enemigos).
     // Reúne lo que antes estaba repartido en las interfaces IMovible, IDanable e IAtacante.
-    internal abstract class Personaje
+    internal abstract class Personaje:GraphicsItem
     {
         // ---------- Posición ----------
         public int X { get; protected set; }
@@ -14,15 +16,17 @@ namespace PixelEscape
         public int Dano { get; protected set; } = 1;
         public int Direccion { get; protected set; } = 1; // -1 izquierda, 1 derecha
         public bool EstaVivo => Vida > 0;
+        protected string Nombre { get; set; }
 
         // ---------- Constructores ----------
-        protected Personaje(int x, int y)
+        protected Personaje(int x, int y, string nombre) : base(x, y, 32, 32, nombre)
         {
             X = x;
             Y = y;
+            Nombre = nombre;
         }
 
-        protected Personaje() : this(0, 0)
+        protected Personaje() : this(0, 0, "Personaje")
         {
         }
 

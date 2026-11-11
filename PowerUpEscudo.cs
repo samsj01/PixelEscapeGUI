@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Protege al jugador de un impacto (le da una vida extra).
     internal class PowerUpEscudo : PowerUpTemporal

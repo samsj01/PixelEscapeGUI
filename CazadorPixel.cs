@@ -1,6 +1,6 @@
 using System;
 
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Enemigo del Nivel 2: más rápido que el Guardián y solo ataca dentro de su rango.
     internal class CazadorPixel : Personaje
@@ -10,7 +10,7 @@ namespace PixelEscape
 
         public double RangoDeteccion { get; private set; } = RangoPorDefecto;
 
-        public CazadorPixel(int x, int y) : base(x, y)
+        public CazadorPixel(int x, int y) : base(x, y, "CazadorPixel")
         {
             Velocidad = VelocidadCazador;
             Dano = 1;

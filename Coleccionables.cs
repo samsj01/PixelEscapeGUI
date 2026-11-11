@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Base de todo lo que el jugador puede recoger.
     // Reúne lo que antes estaba en la interfaz IRecolectable.

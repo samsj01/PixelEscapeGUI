@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Salida del nivel: se abre si el jugador ya recogió la llave.
     internal class Puerta : ObjetoInteractivo

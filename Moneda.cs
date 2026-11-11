@@ -1,4 +1,4 @@
-namespace PixelEscape
+namespace PixelEsGUI
 {
     // Suma puntos al jugador.
     internal class Moneda : Coleccionables
