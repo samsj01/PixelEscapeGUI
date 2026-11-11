@@ -1,0 +1,24 @@
+# ==================================
+# Visual Studio / C# .gitignore
+# ==================================
+
+# Carpetas de compilación (Binarios y objetos)
+[Bb]in/
+[Oo]bj/
+
+# Carpetas ocultas y configuraciones locales de Visual Studio
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Archivos temporales y cachés
+*.cache
+*.tmp
+*.log
+
+# Archivos generados
+*.dll
+*.exe
+*.pdb

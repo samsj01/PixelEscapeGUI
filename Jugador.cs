@@ -12,6 +12,24 @@ namespace PixelEsGUI
         const int FuerzaSaltoBase = 3;
         const double Tiempo = 0.25;                  // intervalo de simulación por fotograma
 
+        // ---------- Hoja de sprites (Resources/jugador_sheet.png) ----------
+        // 8 cuadros por fila y 6 filas. Solo hay animaciones hacia abajo (izquierda y derecha):
+        //   fila 0: quieto izq    fila 1: quieto der
+        //   fila 2: camina izq    fila 3: camina der
+        //   fila 4: salta izq     fila 5: salta der
+        const int ColumnasHoja = 8;
+        const int FilasHoja = 6;
+        const int FilaQuieto = 0;
+        const int FilaCamina = 2;
+        const int FilaSalta = 4;
+        const float FpsQuieto = 6f;
+        const float FpsCamina = 12f;
+        const float FpsSalta = 12f;
+
+        enum EstadoAnimacion { Ninguno, Quieto, Camina, Salta }
+        EstadoAnimacion estadoAnimacion = EstadoAnimacion.Ninguno;
+        int direccionAnimacion;
+
         // ---------- Estado del salto en curso ----------
         double velx;               // velocidad horizontal del salto (negativa = izquierda)
         double angulo;
@@ -29,10 +47,11 @@ namespace PixelEsGUI
         public int FuerzaSalto => FuerzaSaltoBase;
         public double VelSalto { get; protected set; } = 5;
 
-        public Jugador(int x, int y) : base(x, y, "Jugador")
+        public Jugador(int x, int y) : base(x, y, "Jugador", ColumnasHoja, FilasHoja, FpsQuieto)
         {
             Vida = 3;
             Dano = 1;
+            ActualizarAnimacion(false);
         }
 
         // ---------- Acciones que disparan los coleccionables ----------
@@ -129,8 +148,56 @@ namespace PixelEsGUI
                 }
             }
 
-            // Fin del fotograma: el movimiento lateral solo cuenta para el salto del mismo fotograma.
+            // Fin del fotograma: se elige el cuadro de animación según lo que pasó en él.
+            ActualizarAnimacion(movimientoHorizontal != 0);
+
+            // El movimiento lateral solo cuenta para el salto del mismo fotograma.
             movimientoHorizontal = 0;
+        }
+
+        // ---------- Animación ----------
+        // Elige la fila de la hoja según el estado y la dirección (-1 izquierda / 1 derecha).
+        // Solo reinicia la animación cuando cambia de estado o de dirección; si no,
+        // el motor sigue avanzando los cuadros por su cuenta.
+        void ActualizarAnimacion(bool caminando)
+        {
+            EstadoAnimacion estado;
+            if (!EnElSuelo)
+            {
+                estado = EstadoAnimacion.Salta;
+            }
+            else if (caminando)
+            {
+                estado = EstadoAnimacion.Camina;
+            }
+            else
+            {
+                estado = EstadoAnimacion.Quieto;
+            }
+
+            if (estado == estadoAnimacion && Direccion == direccionAnimacion)
+            {
+                return;
+            }
+            estadoAnimacion = estado;
+            direccionAnimacion = Direccion;
+
+            int columnaDireccion = Direccion < 0 ? 0 : 1; // 0 = izquierda, 1 = derecha
+            switch (estado)
+            {
+                case EstadoAnimacion.Salta:
+                    SetFPS(FpsSalta);
+                    SeleccionarFila(FilaSalta + columnaDireccion, false); // una sola vez por salto
+                    break;
+                case EstadoAnimacion.Camina:
+                    SetFPS(FpsCamina);
+                    SeleccionarFila(FilaCamina + columnaDireccion, true);
+                    break;
+                default:
+                    SetFPS(FpsQuieto);
+                    SeleccionarFila(FilaQuieto + columnaDireccion, true);
+                    break;
+            }
         }
     }
 }

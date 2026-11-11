@@ -4,11 +4,13 @@ namespace PixelEsGUI
 {
     // Base de todos los personajes (jugador y enemigos).
     // Reúne lo que antes estaba repartido en las interfaces IMovible, IDanable e IAtacante.
-    internal abstract class Personaje:GraphicsItem
+    // Hereda de AnimatedItem (y no de GraphicsItem) para que el motor dibuje UN fotograma
+    // de la hoja de sprites a la vez, en lugar de estirar la imagen completa.
+    internal abstract class Personaje : AnimatedItem
     {
         // ---------- Posición ----------
-        public int X { get; protected set; }
-        public int Y { get; protected set; }
+        public new int X { get; protected set; }
+        public new int Y { get; protected set; }
 
         // ---------- Estado ----------
         public int Vida { get; protected set; } = 1;
@@ -19,11 +21,24 @@ namespace PixelEsGUI
         protected string Nombre { get; set; }
 
         // ---------- Constructores ----------
-        protected Personaje(int x, int y, string nombre) : base(x, y, 32, 32, nombre)
+        // Sin hoja de sprites (enemigos por ahora): se dibuja el cuadro de color de 32x32 de siempre.
+        protected Personaje(int x, int y, string nombre) : this(x, y, nombre, 1, 1, 1f)
+        {
+        }
+
+        // Con hoja de sprites: 'columnas' x 'filas' cuadros; el recurso se busca por 'nombre'.
+        protected Personaje(int x, int y, string nombre, int columnas, int filas, float fps)
+            : base(x, y, columnas, filas, fps, nombre)
         {
             X = x;
             Y = y;
             Nombre = nombre;
+
+            if (Imagen == null)
+            {
+                Ancho = 32;
+                Alto = 32;
+            }
         }
 
         protected Personaje() : this(0, 0, "Personaje")
@@ -31,10 +46,12 @@ namespace PixelEsGUI
         }
 
         // ---------- Movimiento (antes IMovible) ----------
+        // Además de guardar X/Y, mueve el sprite en el motor (si no, se dibujaría siempre en el origen).
         public void SetPos(int x, int y)
         {
             X = x;
             Y = y;
+            base.SetPos(x, y);
         }
 
         // Devuelve true si el personaje se movió. Las subclases pueden restringirlo.
