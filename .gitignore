@@ -20,5 +20,6 @@
 
 # Archivos generados
 *.dll
+!Engine2D.dll
 *.exe
 *.pdb
