@@ -3,7 +3,9 @@ namespace PixelEsGUI
     // Protege al jugador de un impacto (le da una vida extra).
     internal class PowerUpEscudo : PowerUpTemporal
     {
-        public PowerUpEscudo(int x, int y, int duracion) : base(x, y, duracion)
+        const int CuadroEscudo = 0; // burbuja con escudo
+
+        public PowerUpEscudo(int x, int y, int duracion) : base(x, y, duracion, CuadroEscudo)
         {
         }
 

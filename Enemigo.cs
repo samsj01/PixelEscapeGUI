@@ -58,9 +58,10 @@ namespace PixelEsGUI
             int fila = anim.Fila + (anim.PorDireccion ? columnaDireccion : 0);
 
             SetFPS(anim.Fps);
-            SeleccionarFila(fila, anim.Repetir);
             // La fila tiene menos cuadros que columnas: solo se reproducen los que existen.
-            EstablecerRangoFrames(fila * ColumnasHoja, fila * ColumnasHoja + anim.Cuadros - 1);
+            // Se pasa 'Repetir' aquí: el parámetro 'loop' de EstablecerRangoFrames vale true por defecto
+            // y, si se omite, convertiría ataques y muerte en animaciones infinitas.
+            EstablecerRangoFrames(fila * ColumnasHoja, fila * ColumnasHoja + anim.Cuadros - 1, anim.Repetir);
         }
 
         // Al llegar a 0 de vida pasa solo a la animación de muerte (polvo).
