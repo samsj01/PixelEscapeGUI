@@ -86,7 +86,17 @@ namespace PixelEsGUI
             scene.AddItem(trampa);
 
             // Coleccionables.
-            AgregarColeccionable(new Moneda(200, 0), 200);
+            //AgregarColeccionable(new Moneda(200, 0), 200);
+            //Ciclo que agrega 20 monedas en línea horizontal, separadas 30 px, empezando en X=100
+            for (int i = 0; i < 20; i++)
+            {
+                int posicionX = 100 + (i * 30);
+
+                AgregarColeccionable(
+                    new Moneda(posicionX, 0),
+                    posicionX
+                );
+            }
             AgregarColeccionable(new Llave(255, 0), 255);
             AgregarColeccionable(new PowerUpEscudo(400, 0, 10), 400);
             AgregarColeccionable(new PowerUpVelocidad(450, 0, 10), 450);
@@ -138,23 +148,66 @@ namespace PixelEsGUI
 
             jugador.Aterrizar();
 
+            //Comprueba si el jugador colisiona con los enemigos y actualiza los booleanos correspondientes
+            // Comprobar colisión con el cazador
+            if (jugador.ColisionaCon(cazador))
+            {
+                evitoCazador = false;
+            }
+
+            // Comprobar colisión con el guardián
+            if (jugador.ColisionaCon(guardian))
+            {
+                evitoGuardian = false;
+            }
+
             // Interacción con los objetos al tocarlos.
             foreach (Coleccionables item in coleccionables)
             {
                 if (!item.Recogido && jugador.ColisionaCon(item))
                 {
                     item.Recoger(jugador);
+
+                    // Comprobar si el objeto recogido es una moneda
+                    if (item is Moneda)
+                    {
+                        monedasRecogidas++;
+                    }
                 }
             }
             if (jugador.ColisionaCon(puntoControl))
             {
                 puntoControl.Activar(jugador);
             }
+            ValidarSalida(); // Aquí se valida si el jugador colisiona con la puerta y si cumple los objetivos del nivel para abrirla.
+        }
+
+        // Valida si el jugador colisiona con la puerta y si cumple los objetivos del nivel para abrirla.
+        void ValidarSalida()
+        {
             if (jugador.ColisionaCon(puerta))
             {
-                puerta.Abrir(jugador); // solo se abre si ya recogió la llave
+                /*if (CumpleObjetivosNivel()) Si se deja el método en puerta, esta sirve para el nivel dos en caso de que si o si se encesite 
+                  Recoger las monedas y la llave para abrir la puerta
+                {
+                    puerta.AbrirSiCumpleObjetivos(true);*/
+
+                    // El jugador completó el nivel
+                    if (nivelActual == 3)
+                    {
+                        juegoTerminado = true;
+                        bucleJuego.Stop();
+
+                    }
+                    else
+                    {
+
+                        // Aquí se debe cargar el siguiente escenario.
+                        nivelActual++;
+                    }
+                
+                
             }
-            trampa.Activar(jugador);
         }
     }
 }

@@ -56,5 +56,49 @@
         #endregion
 
         private Engine2D.GraphicsView Visor;
+
+        //  Niveles
+        // Control de niveles
+        int nivelActual = 1;
+
+        // Cantidad de monedas recogidas en el nivel actual
+        int monedasRecogidas = 0;
+
+        // Control de los enemigos
+        bool evitoCazador = true;
+        bool evitoGuardian = true;
+
+        // Control de finalización del nivel
+        bool juegoTerminado = false;
+
+        //Swicth case para cambiar de nivel 
+        bool CumpleObjetivosNivel()
+        {
+            switch (nivelActual)
+            {
+                case 1:
+                    // Nivel 1: recoger 20 monedas
+                    return monedasRecogidas >= 20;
+
+                case 2:
+                    // Nivel 2: llave y evitar los dos enemigos
+                    return jugador.TieneLlave
+                        && evitoCazador
+                        && evitoGuardian;
+
+                case 3:
+                    // Nivel 3: monedas, llave y evitar enemigos
+                    return monedasRecogidas >= 20
+                        && jugador.TieneLlave
+                        && evitoCazador
+                        && evitoGuardian;
+
+                default:
+                    return false;
+            }
+        }
+
+
+
     }
 }
