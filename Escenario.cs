@@ -11,6 +11,7 @@ namespace PixelEsGUI
 
         // Objetos del escenario.
         readonly List<Coleccionables> coleccionables = new List<Coleccionables>();
+        readonly List<Bloque> bloques = new List<Bloque>(); // bloques de terreno del nivel actual
         Puerta puerta;
         PuntoControl puntoControl;
         Trampa trampa;
@@ -24,7 +25,7 @@ namespace PixelEsGUI
 
         public Escenario()
         {
-            
+
             InitializeComponent();
             ClientSize = new Size(920, 490); // más ancho para que quepan todos los objetos
             StartPosition = FormStartPosition.CenterScreen;
@@ -38,7 +39,7 @@ namespace PixelEsGUI
             Visor.Scene = scene;
             Visor.Dock = DockStyle.Fill;
 
-            
+
 
             jugador = new Jugador(100, 100);
             scene.AddItem(jugador);
@@ -163,6 +164,55 @@ namespace PixelEsGUI
             AgregarColeccionable(new PowerUpVelocidad(450, 0, 10), 450);
         }
 
+        // ---------- Bloques de terreno (tileset.png) ----------
+        // Crea UN bloque: (fila, columna) es el cuadro de 16x16 dentro de la hoja "TileSet".
+        void AgregarBloque(int x, int y, int fila, int columna)
+        {
+            Bloque bloque = new Bloque(x, y, fila, columna);
+            bloque.SetPos(x, y);
+            bloque.ZValue = -2; // detrás de puerta/trampa (-1) y del personaje
+            bloques.Add(bloque);
+            scene.AddItem(bloque);
+        }
+
+        // Suelo completo: una fila de césped en Y = Suelo y tierra hacia abajo hasta el borde de la ventana.
+        void CrearSuelo()
+        {
+            int[] columnasCesped = { 1, 3, 5 };                                   // 3 variantes de césped (fila 1)
+            int[,] tierra = { { 3, 1 }, { 3, 5 }, { 5, 1 }, { 5, 3 }, { 5, 5 } }; // 5 variantes de tierra
+
+            int columnas = ClientSize.Width / Bloque.Tamano + 1;
+            int filas = (ClientSize.Height - Suelo) / Bloque.Tamano + 1;
+
+            for (int c = 0; c < columnas; c++)
+            {
+                for (int f = 0; f < filas; f++)
+                {
+                    int x = c * Bloque.Tamano;
+                    int y = Suelo + f * Bloque.Tamano;
+
+                    if (f == 0)
+                    {
+                        AgregarBloque(x, y, 1, columnasCesped[c % 3]);
+                    }
+                    else
+                    {
+                        int t = (c * 7 + f * 3) % 5; // reparto "aleatorio" pero fijo
+                        AgregarBloque(x, y, tierra[t, 0], tierra[t, 1]);
+                    }
+                }
+            }
+        }
+
+        // Plataforma flotante de 'cantidad' bloques de piedra, con la esquina superior izquierda en (x, y).
+        void CrearPlataforma(int x, int y, int cantidad)
+        {
+            for (int i = 0; i < cantidad; i++)
+            {
+                AgregarBloque(x + i * Bloque.Tamano, y, 1, 7);
+            }
+        }
+
         void AgregarColeccionable(Coleccionables item, int x)
         {
             item.SetPos(x, Suelo - (int)item.Alto);
@@ -231,12 +281,14 @@ namespace PixelEsGUI
             // Comprobar si evita los enemigos
             if (nivelActual >= 2)
             {
-                if (jugador.ColisionaCon(cazador))
+                Rectangle cuerpoJugador = CuerpoJugador();
+
+                if (cuerpoJugador.IntersectsWith(CuerpoCazador()))
                 {
                     evitoCazador = false;
                 }
 
-                if (jugador.ColisionaCon(guardian))
+                if (cuerpoJugador.IntersectsWith(CuerpoGuardian()))
                 {
                     evitoGuardian = false;
                 }
@@ -255,6 +307,13 @@ namespace PixelEsGUI
             trampa.Activar(jugador);
         }
 
+
+        // Rectángulos del cuerpo REAL de cada personaje. Los cuadros de las hojas de sprites
+        // (96x128 el jugador, 96x96 los enemigos) tienen mucho espacio transparente; colisionar
+        // con el cuadro completo hace que "tocar" al enemigo ocurra a ~50 px de distancia.
+        Rectangle CuerpoJugador() => new Rectangle(jugador.X + 32, jugador.Y + 36, 34, 52);
+        Rectangle CuerpoGuardian() => new Rectangle(guardian.X + 24, guardian.Y + 23, 48, 46);
+        Rectangle CuerpoCazador() => new Rectangle(cazador.X + 27, cazador.Y + 23, 42, 45);
 
         bool ColisionPuerta()
         {
@@ -303,7 +362,7 @@ namespace PixelEsGUI
 
             transicionEnCurso = false;
 
-           // avisoObjetivosMostrado = false;  mensaje
+            // avisoObjetivosMostrado = false;  mensaje
 
             // Ocultar los objetos del nivel anterior
             foreach (Coleccionables item in coleccionables)
@@ -312,6 +371,14 @@ namespace PixelEsGUI
             }
 
             coleccionables.Clear();
+
+            // Quitar los bloques del nivel anterior
+            foreach (Bloque bloque in bloques)
+            {
+                bloque.Visible = false;
+            }
+
+            bloques.Clear();
 
             if (puerta != null)
                 puerta.Visible = false;
@@ -323,6 +390,16 @@ namespace PixelEsGUI
                 trampa.Visible = false;
 
 
+            // Construir el terreno del nivel (el suelo es igual en todos; las plataformas cambian)
+            CrearSuelo();
+
+            if (nivelActual >= 2)
+            {
+                // Una plataforma para cada enemigo (guardián en x=300, cazador en x=520).
+                CrearPlataforma(300, Suelo - 64, 3);
+                CrearPlataforma(520, Suelo - 64, 3);
+            }
+
             // Reiniciar al jugador
             jugador.ReiniciarEstado(100, 100);
             jugador.Visible = true;
@@ -333,8 +410,10 @@ namespace PixelEsGUI
             cazador.Visible = enemigosActivos;
             guardian.Visible = enemigosActivos;
 
-            cazador.SetPos(550, 120);
-            guardian.SetPos(280, 120);
+            // Los enemigos se paran sobre las plataformas (su borde superior está en Suelo - 64).
+            // Los pies quedan a 68-69 px del borde superior del cuadro de 96x96 del sprite.
+            guardian.SetPos(300, Suelo - 64 - 69);
+            cazador.SetPos(520, Suelo - 64 - 68);
 
             // Crear la nueva puerta
             puerta = new Puerta(780, 0);
@@ -485,12 +564,22 @@ namespace PixelEsGUI
                     // el jugador permanece junto a la puerta.
                     if (!avisoObjetivosMostrado)
                     {
+                        // Marcar ANTES de mostrar: MessageBox deja correr el Timer del juego y,
+                        // si el aviso se marca después, cada fotograma abre otra ventana.
+                        avisoObjetivosMostrado = true;
+                        bucleJuego.Stop(); // pausar el juego mientras se lee el aviso
+
                         MessageBox.Show(
                             mensaje,
                             "Objetivos pendientes"
                         );
 
-                        avisoObjetivosMostrado = true;
+                        // Mientras estaba la ventana no llegaron los KeyUp: soltar las teclas.
+                        izquierda = false;
+                        derecha = false;
+                        salto = false;
+
+                        bucleJuego.Start();
                     }
                 }
             }
