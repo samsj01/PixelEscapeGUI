@@ -32,22 +32,25 @@ namespace PixelEsGUI
             return EstadoPuerta;
         }
 
-
-        //Este método se puede usar para abrir la puerta si se cumplen los objetivos del nivel, pero no es necesario ya que el método Abrir() ya verifica si el jugador tiene la llave.
-        //El método abrir la puerta se puede llamar desde el Escenario.cs cuando se cumplan los objetivos del nivel, y no es necesario pasar un parámetro booleano.
-        //El método abrir por si solo se cumpl si solo se tiene la llave, este permita abrir la puerta cuando se hayan cumplido los requisitos del nivel
-        /*public bool AbrirSiCumpleObjetivos(bool cumple)
+        // Método para abrir la puerta sin necesidad de un jugador (por ejemplo, para pruebas o eventos especiales)
+        //Abrir(Jugador jugador): mantiene la comprobación original de la llave.
+        //Abrir() : permite abrir la puerta cuando el sistema ya verificó los objetivos
+        public bool Abrir()
         {
-        if (cumple && !EstadoPuerta)
-        {
-            EstadoPuerta = true;
-            Activo = true;
+            if (!EstadoPuerta)
+            {
+                EstadoPuerta = true;
+                Activo = true;
 
-            EstablecerRangoFrames(0,TotalCuadros - 1,false);
+                EstablecerRangoFrames(
+                    0,
+                    TotalCuadros - 1,
+                    false
+                );
+            }
+
+            return EstadoPuerta;
         }
 
-        return EstadoPuerta;
-        }
-          */
     }
 }

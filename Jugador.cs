@@ -65,6 +65,35 @@ namespace PixelEsGUI
             TieneLlave = true;
         }
 
+        //Para perder la llave cuando el jugador muere, se reinicia el juego y pierde la llave que tenía, tambien para cuando inicia un nuevo nivel, se reinicia el juego y pierde la llave que tenía
+
+        public void ReiniciarEstado(int x, int y)
+        {
+            // Reiniciar llave
+            TieneLlave = false;
+
+            // Reiniciar salto
+            EnElSuelo = true;
+            SaltoParabolico = false;
+            VelY = 0;
+
+            velx = 0;
+            tiempoVuelo = 0;
+            movimientoHorizontal = 0;
+
+            // Reiniciar posición
+            sueloY = y;
+            SetPos(x, y);
+
+            // Volver a mostrar el personaje
+            Visible = true;
+
+            // Actualizar animación
+            estadoAnimacion = EstadoAnimacion.Ninguno;
+            ActualizarAnimacion(false);
+        }
+
+
         // ---------- Movimiento ----------
         // En el aire el desplazamiento lo controla el salto; en el suelo se mueve normal
         // y se recuerda la dirección para decidir el tipo de salto.
