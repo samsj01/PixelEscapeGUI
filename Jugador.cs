@@ -66,6 +66,20 @@ namespace PixelEsGUI
         }
 
         // ---------- Acciones que disparan los coleccionables ----------
+        public void EstablecerPuntaje(int puntos)
+        {
+            Puntaje = puntos;
+        }
+
+        public void ReiniciarPartida()
+        {
+            Vida = 3;
+            Puntaje = 0;
+            TieneLlave = false;
+            TieneEscudo = false;
+            fotogramasInvulnerable = 0;
+        }
+
         public void SumarPuntos(int puntos)
         {
             Puntaje += puntos;

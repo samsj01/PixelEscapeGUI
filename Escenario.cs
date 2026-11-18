@@ -10,6 +10,7 @@ namespace PixelEsGUI
         readonly List<CazadorPixel> cazadores = new List<CazadorPixel>();
         readonly List<GuardianPixel> guardianes = new List<GuardianPixel>();
         readonly List<Trampa> trampas = new List<Trampa>();
+        readonly Dictionary<Enemigo, (int Min, int Max)> limitesPatrulla = new Dictionary<Enemigo, (int Min, int Max)>();
 
         // Objetos del escenario.
         readonly List<Coleccionables> coleccionables = new List<Coleccionables>();
@@ -18,7 +19,7 @@ namespace PixelEsGUI
         PuntoControl puntoControl;
 
         // Altura del "suelo" donde se apoyan los objetos (la base de cada sprite queda en esta Y).
-        const int Suelo = 190;
+        const int Suelo = 300;
 
         // ---------- Cámara ----------
         // Ancho TOTAL de cada nivel en píxeles (posición 0 = nivel 1). La ventana solo muestra
@@ -50,7 +51,7 @@ namespace PixelEsGUI
 
 
 
-            jugador = new Jugador(100, 100);
+            jugador = new Jugador(100, Suelo - 88);
             scene.AddItem(jugador);
 
             // Cargar el primer nivel
@@ -199,9 +200,9 @@ namespace PixelEsGUI
         // Y de la superficie de las plataformas bajas: el salto del jugador sube ~98 px, así que
         // 86 px sobre el suelo se alcanza siempre. Su borde de abajo (136) deja pasar caminando por debajo.
         const int YPlataforma = Suelo - 86;
-        const int YEnemigo = 120;           // los enemigos quedan con los pies sobre el suelo
-        const int YMonedaSuelo = Suelo - 40; // la moneda mide 40 px
-        const int YMonedaPlataforma = YPlataforma - 40;
+        const int YEnemigo = Suelo - 69;       // los enemigos quedan con los pies sobre el suelo
+        const int YMonedaSuelo = Suelo - 100; // moneda pequeña, elevada para exigir salto
+        const int YMonedaPlataforma = YPlataforma - 30;
 
         // Moneda suelta en (x, y).
         void AgregarMonedaEn(int x, int y)
@@ -231,7 +232,7 @@ namespace PixelEsGUI
         void AgregarMonedasArcoSobreTrampa(int xTrampa)
         {
             int[] desfase = { -100, -50, 0, 50, 100 };
-            int[] alturas = { 130, 105, 90, 105, 130 };
+            int[] alturas = { Suelo - 125, Suelo - 145, Suelo - 155, Suelo - 145, Suelo - 125 };
             for (int i = 0; i < 5; i++)
             {
                 AgregarMonedaEn(xTrampa + 12 + desfase[i], alturas[i]);
@@ -253,6 +254,7 @@ namespace PixelEsGUI
         {
             GuardianPixel g = new GuardianPixel(x, YEnemigo);
             guardianes.Add(g);
+            limitesPatrulla[g] = (Math.Max(0, x - 70), x + 70);
             scene.AddItem(g);
             CrearPlataforma(x - 16, YPlataforma, 4);
         }
@@ -263,6 +265,7 @@ namespace PixelEsGUI
         {
             CazadorPixel c = new CazadorPixel(x, YEnemigo);
             cazadores.Add(c);
+            limitesPatrulla[c] = (Math.Max(0, x - 90), x + 90);
             scene.AddItem(c);
             CrearPlataforma(x, YPlataforma, 3);
         }
@@ -272,6 +275,7 @@ namespace PixelEsGUI
         {
             GuardianPixel g = new GuardianPixel(x, YEnemigo);
             guardianes.Add(g);
+            limitesPatrulla[g] = (Math.Max(0, x - 70), x + 70);
             scene.AddItem(g);
         }
 
@@ -280,6 +284,7 @@ namespace PixelEsGUI
         {
             CazadorPixel c = new CazadorPixel(x, YEnemigo);
             cazadores.Add(c);
+            limitesPatrulla[c] = (Math.Max(0, x - 90), x + 90);
             scene.AddItem(c);
         }
 
@@ -294,6 +299,22 @@ namespace PixelEsGUI
 
         // Posición X del punto de control de cada nivel (a mitad del recorrido).
         readonly int[] xPuntoControl = { 1060, 1400, 1800 };
+
+        void ActualizarPatrullas()
+        {
+            foreach (var entrada in limitesPatrulla)
+            {
+                Enemigo enemigo = entrada.Key;
+                if (!enemigo.EstaVivo) continue;
+                int minimo = entrada.Value.Min;
+                int maximo = entrada.Value.Max;
+                if (enemigo.X <= minimo) enemigo.CambiarDireccionPatrulla(1);
+                else if (enemigo.X >= maximo) enemigo.CambiarDireccionPatrulla(-1);
+                if (enemigo.DireccionActual < 0) enemigo.MoverIzq();
+                else enemigo.MoverDer();
+                enemigo.Animar(Enemigo.EstadoAnimacion.Camina);
+            }
+        }
 
         void CambiarTecla(Keys tecla, bool presionada)
         {
@@ -321,6 +342,9 @@ namespace PixelEsGUI
             if (transicionEnCurso || juegoTerminado)
                 return;
 
+            // Los enemigos patrullan continuamente dentro de su zona.
+            ActualizarPatrullas();
+
             // Movimiento del jugador
             if (derecha)
             {
@@ -346,7 +370,11 @@ namespace PixelEsGUI
             // Recoger monedas y otros coleccionables
             foreach (Coleccionables item in coleccionables)
             {
-                if (!item.Recogido && jugador.ColisionaCon(item))
+                Rectangle rectItem = new Rectangle(item.X, item.Y, (int)item.Ancho, (int)item.Alto);
+                bool colisionColeccionable = (item is Moneda || item is Llave)
+                    ? jugador.Cuerpo.IntersectsWith(rectItem)
+                    : jugador.ColisionaCon(item);
+                if (!item.Recogido && colisionColeccionable)
                 {
                     item.Recoger(jugador);
 
@@ -357,61 +385,41 @@ namespace PixelEsGUI
                 }
             }
 
-            // Comprobar si evita los enemigos
-            if (nivelActual >= 2)
+            // El contacto con cualquier enemigo descuenta una vida.
+            Rectangle cuerpoJugador = CuerpoJugador();
+            foreach (CazadorPixel c in cazadores)
             {
-                Rectangle cuerpoJugador = CuerpoJugador();
-
-                foreach (CazadorPixel c in cazadores)
+                if (cuerpoJugador.IntersectsWith(CuerpoCazador(c)))
                 {
-                    if (cuerpoJugador.IntersectsWith(CuerpoCazador(c)))
-                    {
-                        if (!jugador.AbsorbeImpacto())
-                        {
-                            evitoCazador = false; // sin escudo: tocarlo hace perder el nivel
-                        }
-                    }
+                    int vidasAntes = jugador.Vida;
+                    jugador.RecibirDano(1);
+                    if (jugador.Vida < vidasAntes) { evitoCazador = false; ResolverImpacto(); return; }
                 }
-
-                foreach (GuardianPixel g in guardianes)
+            }
+            foreach (GuardianPixel g in guardianes)
+            {
+                if (cuerpoJugador.IntersectsWith(CuerpoGuardian(g)))
                 {
-                    if (cuerpoJugador.IntersectsWith(CuerpoGuardian(g)))
-                    {
-                        if (!jugador.AbsorbeImpacto())
-                        {
-                            evitoGuardian = false; // sin escudo: tocarlo hace perder el nivel
-                        }
-                    }
+                    int vidasAntes = jugador.Vida;
+                    jugador.RecibirDano(1);
+                    if (jugador.Vida < vidasAntes) { evitoGuardian = false; ResolverImpacto(); return; }
                 }
             }
 
-            // Tocar a un enemigo = perder el nivel
-            if (nivelActual >= 2 && (!evitoCazador || !evitoGuardian))
-            {
-                PerderNivel();
-                return;
-            }
-
-            // Activar punto de control: la primera vez guarda la posición y el progreso
+            // Activar punto de control: la primera vez guarda posición y progreso.
             if (!puntoControl.Activo && jugador.ColisionaCon(puntoControl))
             {
                 puntoControl.Activar(jugador);
                 GuardarPuntoControl();
             }
-
-            // Comprobar si puede abrir la puerta
             ValidarSalida();
 
-            // Activar trampas
+            // Las trampas descuentan una vida al entrar en su zona.
             foreach (Trampa t in trampas)
             {
+                int vidasAntes = jugador.Vida;
                 t.Activar(jugador);
-            }
-
-            // Sin vidas = perder el nivel
-            if (!jugador.EstaVivo)
-            {
-                PerderNivel();
+                if (jugador.Vida < vidasAntes) { ResolverImpacto(); return; }
             }
         }
 
@@ -477,13 +485,13 @@ namespace PixelEsGUI
         const int VidaInicial = 3;
         bool puntoControlGuardado;                                   // true si ya se activó en este nivel
         int xRespawn;                                                // X donde reaparece el jugador
-        readonly List<int> indicesRecogidos = new List<int>();       // coleccionables que ya tenía al activarlo
+        readonly List<int> indicesRecogidos = new List<int>();
+        int puntajeCheckpoint;       // coleccionables que ya tenía al activarlo
 
         // Control de niveles
         int nivelActual = 1;
 
         int monedasRecogidas = 0;
-
         bool evitoCazador = true;
         bool evitoGuardian = true;
 
@@ -509,9 +517,11 @@ namespace PixelEsGUI
             }
 
             monedasRecogidas = 0;
-
-            evitoCazador = true;
-            evitoGuardian = true;
+            if (!desdePuntoControl)
+            {
+                evitoCazador = true;
+                evitoGuardian = true;
+            }
 
             transicionEnCurso = false;
 
@@ -537,6 +547,7 @@ namespace PixelEsGUI
                 scene.RemoveItem(g);
             }
             guardianes.Clear();
+            limitesPatrulla.Clear();
 
             foreach (CazadorPixel c in cazadores)
             {
@@ -570,9 +581,8 @@ namespace PixelEsGUI
 
             // Reiniciar al jugador: en el punto de control si venimos de una derrota, si no en el inicio
             int xInicio = desdePuntoControl ? xRespawn : 100;
-            jugador.ReiniciarEstado(xInicio, 100);
+            jugador.ReiniciarEstado(xInicio, Suelo - 88);
             jugador.Visible = true;
-            jugador.GanarVida(VidaInicial - jugador.Vida); // vida completa
             if (desdePuntoControl)
             {
                 RestaurarProgresoGuardado();
@@ -607,6 +617,7 @@ namespace PixelEsGUI
             puntoControlGuardado = true;
             xRespawn = puntoControl.X - 16; // el cuerpo del jugador queda sobre la bandera
 
+            puntajeCheckpoint = jugador.Puntaje;
             indicesRecogidos.Clear();
             for (int i = 0; i < coleccionables.Count; i++)
             {
@@ -621,6 +632,7 @@ namespace PixelEsGUI
         // (Los objetos se crean siempre en el mismo orden, por eso el índice identifica a cada uno.)
         void RestaurarProgresoGuardado()
         {
+            jugador.EstablecerPuntaje(puntajeCheckpoint);
             foreach (int i in indicesRecogidos)
             {
                 if (i < coleccionables.Count)
@@ -632,14 +644,28 @@ namespace PixelEsGUI
                     }
                 }
             }
+            jugador.EstablecerPuntaje(puntajeCheckpoint);
         }
 
         // Derrota (tocar un enemigo o quedarse sin vidas): el nivel se reinicia por completo
         // (enemigos, trampas, monedas y llave posteriores al punto de control, vida y objetivos).
         // Si ya se activó el punto de control, el jugador reaparece ahí; si no, al inicio.
-        void PerderNivel()
+        void ResolverImpacto()
         {
-            CargarNivel(nivelActual, puntoControlGuardado);
+            if (!jugador.EstaVivo)
+            {
+                // Al perder la tercera vida se reinicia toda la partida.
+                jugador.ReiniciarPartida();
+                puntoControlGuardado = false;
+                indicesRecogidos.Clear();
+                puntajeCheckpoint = 0;
+                CargarNivel(1, false);
+            }
+            else
+            {
+                // Con vidas restantes vuelve al checkpoint o al inicio del nivel.
+                CargarNivel(nivelActual, puntoControlGuardado);
+            }
         }
 
         // =====================================================================================

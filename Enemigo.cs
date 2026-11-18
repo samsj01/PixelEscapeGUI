@@ -21,6 +21,9 @@ namespace PixelEsGUI
         {
         }
 
+        public int DireccionActual => Direccion;
+        public void CambiarDireccionPatrulla(int direccion) { Direccion = direccion < 0 ? -1 : 1; }
+
         // Cada enemigo describe sus animaciones (fila, cuántos cuadros, velocidad).
         protected abstract Animacion ObtenerAnimacion(EstadoAnimacion estado);
 

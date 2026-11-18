@@ -12,7 +12,7 @@ namespace PixelEsGUI
         const int PrimerCuadro = 1;
         const int UltimoCuadro = 9;
         const float Fps = 12f;
-        const float TamanoPantalla = 40f; // px en pantalla (cuadrado)
+        const float TamanoPantalla = 24f; // px en pantalla (cuadrado)
 
         public int Valor { get; }
 

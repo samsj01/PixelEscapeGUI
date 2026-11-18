@@ -8,8 +8,8 @@ namespace PixelEsGUI
         const int ColumnasHoja = 25;
         const int FilasHoja = 1;
         const float Fps = 12f;
-        const float AnchoPantalla = 20f; // 2x el tamaño original (10x27)
-        const float AltoPantalla = 54f;
+        const float AnchoPantalla = 14f; // 2x el tamaño original (10x27)
+        const float AltoPantalla = 38f;
 
         public Llave(int x, int y) : base(x, y, "Llave", ColumnasHoja, FilasHoja, Fps)
         {

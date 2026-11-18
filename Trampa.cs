@@ -12,9 +12,8 @@ namespace PixelEsGUI
         const int CuadroReposo = 0;
         const int UltimoCuadro = ColumnasHoja - 1;
         const float Fps = 12f;
-        const float TamanoPantalla = 64f; // 2x el tamaño original (32x32)
+        const float TamanoPantalla = 48f; // 2x el tamaño original (32x32)
 
-        bool reproduciendo; // true mientras corre la animación de las púas
         bool jugadorEncima; // true mientras el jugador sigue dentro de la zona de la trampa
 
         public int Dano { get; }
@@ -23,7 +22,7 @@ namespace PixelEsGUI
         {
             Dano = dano;
             FijarTamano(TamanoPantalla, TamanoPantalla);
-            EstablecerRangoFrames(CuadroReposo, CuadroReposo, false);
+            EstablecerRangoFrames(CuadroReposo, UltimoCuadro, true);
         }
 
         public override bool Activar(Jugador jugador)
@@ -37,11 +36,7 @@ namespace PixelEsGUI
             if (pisando && !jugadorEncima)
             {
                 jugador.RecibirDano(Dano);
-                if (!reproduciendo)
-                {
-                    reproduciendo = true;
-                    EstablecerRangoFrames(CuadroReposo, UltimoCuadro, false); // las púas salen, una vez
-                }
+                // La animación ya está en bucle desde que se crea la trampa.
             }
             jugadorEncima = pisando;
             Activo = pisando;
@@ -52,11 +47,6 @@ namespace PixelEsGUI
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
-            if (reproduciendo && !IsPlaying)
-            {
-                reproduciendo = false;
-                EstablecerRangoFrames(CuadroReposo, CuadroReposo, false);
-            }
         }
     }
 }
