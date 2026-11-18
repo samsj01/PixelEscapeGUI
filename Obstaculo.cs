@@ -1,17 +1,28 @@
+using Engine2D;
+
 namespace PixelEsGUI
 {
-    // Bloquea el paso del jugador.
-    internal class Obstaculo
+    // Bloque de terreno (césped, tierra, piedra) tomado de Resources/tileset.png (recurso "TileSet").
+    // ---------- Hoja de sprites ----------
+    // 400x368 dividido en cuadros de 16x16 => 25 columnas x 23 filas (575 cuadros).
+    // Número de cuadro = fila * 25 + columna (se cuenta de izquierda a derecha, de arriba abajo).
+    // Cuadros útiles (fila, columna):
+    //   césped arriba: (1,1) (1,3) (1,5)     piedra: (1,7)
+    //   tierra:        (3,1) (3,5) (5,1) (5,3) (5,5)
+    internal class Obstaculo : ObjetoInteractivo
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public string Tipo { get; }
+        const int ColumnasHoja = 25;
+        const int FilasHoja = 23;
+        public const int Tamano = 32; // cada cuadro de 16x16 se dibuja al doble
 
-        public Obstaculo(int x, int y, string tipo)
+        public Obstaculo(int x, int y, int fila, int columna)
+            : base(x, y, "TileSet", ColumnasHoja, FilasHoja, 1f)
         {
-            X = x;
-            Y = y;
-            Tipo = tipo;
+            FijarTamano(Tamano, Tamano);
+
+            // Un solo cuadro fijo de la hoja (sin animación).
+            int cuadro = fila * ColumnasHoja + columna;
+            EstablecerRangoFrames(cuadro, cuadro, false);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace PixelEsGUI
 
         // Objetos del escenario.
         readonly List<Coleccionables> coleccionables = new List<Coleccionables>();
-        readonly List<Bloque> bloques = new List<Bloque>(); // bloques de terreno del nivel actual
+        readonly List<Obstaculo> obstaculos = new List<Obstaculo>(); // bloques de terreno del nivel actual
         Puerta puerta;
         PuntoControl puntoControl;
 
@@ -129,15 +129,15 @@ namespace PixelEsGUI
             };
         }
 
-        // ---------- Bloques de terreno (tileset.png) ----------
-        // Crea UN bloque: (fila, columna) es el cuadro de 16x16 dentro de la hoja "TileSet".
-        void AgregarBloque(int x, int y, int fila, int columna)
+        // ---------- Obstáculos de terreno (tileset.png) ----------
+        // Crea UN obstáculo: (fila, columna) es el cuadro de 16x16 dentro de la hoja "TileSet".
+        void AgregarObstaculo(int x, int y, int fila, int columna)
         {
-            Bloque bloque = new Bloque(x, y, fila, columna);
-            bloque.SetPos(x, y);
-            bloque.ZValue = -2; // detrás de puerta/trampa (-1) y del personaje
-            bloques.Add(bloque);
-            scene.AddItem(bloque);
+            Obstaculo obstaculo = new Obstaculo(x, y, fila, columna);
+            obstaculo.SetPos(x, y);
+            obstaculo.ZValue = -2; // detrás de puerta/trampa (-1) y del personaje
+            obstaculos.Add(obstaculo);
+            scene.AddItem(obstaculo);
         }
 
         // Suelo completo: una fila de césped en Y = Suelo y tierra hacia abajo hasta el borde de la ventana.
@@ -146,24 +146,24 @@ namespace PixelEsGUI
             int[] columnasCesped = { 1, 3, 5 };                                   // 3 variantes de césped (fila 1)
             int[,] tierra = { { 3, 1 }, { 3, 5 }, { 5, 1 }, { 5, 3 }, { 5, 5 } }; // 5 variantes de tierra
 
-            int columnas = AnchoNivel / Bloque.Tamano + 1;
-            int filas = (ClientSize.Height - Suelo) / Bloque.Tamano + 1;
+            int columnas = AnchoNivel / Obstaculo.Tamano + 1;
+            int filas = (ClientSize.Height - Suelo) / Obstaculo.Tamano + 1;
 
             for (int c = 0; c < columnas; c++)
             {
                 for (int f = 0; f < filas; f++)
                 {
-                    int x = c * Bloque.Tamano;
-                    int y = Suelo + f * Bloque.Tamano;
+                    int x = c * Obstaculo.Tamano;
+                    int y = Suelo + f * Obstaculo.Tamano;
 
                     if (f == 0)
                     {
-                        AgregarBloque(x, y, 1, columnasCesped[c % 3]);
+                        AgregarObstaculo(x, y, 1, columnasCesped[c % 3]);
                     }
                     else
                     {
                         int t = (c * 7 + f * 3) % 5; // reparto "aleatorio" pero fijo
-                        AgregarBloque(x, y, tierra[t, 0], tierra[t, 1]);
+                        AgregarObstaculo  (x, y, tierra[t, 0], tierra[t, 1]);
                     }
                 }
             }
@@ -174,11 +174,11 @@ namespace PixelEsGUI
         {
             for (int i = 0; i < cantidad; i++)
             {
-                AgregarBloque(x + i * Bloque.Tamano, y, 1, 7);
+                AgregarObstaculo(x + i * Obstaculo.Tamano, y, 1, 7);
             }
 
             // Se registra como superficie sólida: el jugador se para encima y no la atraviesa.
-            jugador.Plataformas.Add(new Rectangle(x, y, cantidad * Bloque.Tamano, Bloque.Tamano));
+            jugador.Plataformas.Add(new Rectangle(x, y, cantidad * Obstaculo.Tamano, Obstaculo.Tamano));
         }
 
         // En el suelo: la base del objeto queda sobre el suelo.
@@ -288,7 +288,7 @@ namespace PixelEsGUI
         {
             CrearPlataforma(xPlataforma, YPlataforma, bloques);
             Llave llave = new Llave(0, 0);
-            int x = xPlataforma + (bloques * Bloque.Tamano - (int)llave.Ancho) / 2; // centrada
+            int x = xPlataforma + (bloques * Obstaculo.Tamano - (int)llave.Ancho) / 2; // centrada
             AgregarColeccionable(llave, x, YPlataforma - (int)llave.Alto);
         }
 
@@ -523,12 +523,12 @@ namespace PixelEsGUI
             }
             coleccionables.Clear();
 
-            foreach (Bloque bloque in bloques)
+            foreach (Obstaculo obstaculo in obstaculos)
             {
-                bloque.Visible = false;
-                scene.RemoveItem(bloque);
+                obstaculo.Visible = false;
+                scene.RemoveItem(obstaculo);
             }
-            bloques.Clear();
+            obstaculos.Clear();
             jugador.Plataformas.Clear();
 
             foreach (GuardianPixel g in guardianes)
