@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -45,11 +45,16 @@ namespace PixelEsGUI
         public int Puntaje { get; private set; }
         public bool TieneLlave { get; private set; }
         public bool TieneEscudo { get; private set; }
+        public bool TieneVelocidad => fotogramasVelocidad > 0;
+        const int VelocidadNormal = 5;
+        int velocidadAnterior = VelocidadNormal;
+        int fotogramasVelocidad;
 
         // Tras romperse el escudo el jugador es invulnerable un instante (60 fotogramas ~ 1 s),
         // para que un enemigo que lo sigue tocando no lo mate en el fotograma siguiente.
         const int FotogramasInvulnerable = 60;
         int fotogramasInvulnerable;
+        int fotogramasReaccionDano;
         public bool Invulnerable => fotogramasInvulnerable > 0;
         public bool EnElSuelo { get; private set; } = true;
         public bool SaltoParabolico { get; private set; }
@@ -78,6 +83,26 @@ namespace PixelEsGUI
             TieneLlave = false;
             TieneEscudo = false;
             fotogramasInvulnerable = 0;
+            fotogramasVelocidad = 0;
+            Velocidad = VelocidadNormal;
+        }
+
+        public void ActivarVelocidadTemporal(int duracionSegundos)
+        {
+            if (fotogramasVelocidad <= 0)
+                velocidadAnterior = Velocidad;
+            Velocidad = 10;
+            fotogramasVelocidad = Math.Max(1, duracionSegundos) * 60;
+        }
+
+        void ActualizarVelocidadTemporal()
+        {
+            if (fotogramasVelocidad > 0)
+            {
+                fotogramasVelocidad--;
+                if (fotogramasVelocidad == 0)
+                    Velocidad = velocidadAnterior;
+            }
         }
 
         public void SumarPuntos(int puntos)
@@ -118,12 +143,27 @@ namespace PixelEsGUI
             {
                 return; // la vida queda igual que antes del impacto
             }
+
+            int vidasAntes = Vida;
             base.RecibirDano(dano);
+            if (Vida < vidasAntes)
+            {
+                // Reacción visual: pequeño retroceso y parpadeo durante la invulnerabilidad.
+                fotogramasReaccionDano = 8;
+                fotogramasInvulnerable = FotogramasInvulnerable;
+                Visible = true;
+            }
         }
 
         // Una vez por fotograma: cuenta la invulnerabilidad y hace parpadear al jugador.
         void ActualizarInvulnerabilidad()
         {
+            if (fotogramasReaccionDano > 0)
+            {
+                SetPos(X - Direccion * 2, Y); // retrocede brevemente en sentido contrario al movimiento
+                fotogramasReaccionDano--;
+            }
+
             if (fotogramasInvulnerable > 0)
             {
                 fotogramasInvulnerable--;
@@ -139,6 +179,9 @@ namespace PixelEsGUI
             TieneLlave = false;
             TieneEscudo = false;
             fotogramasInvulnerable = 0;
+            fotogramasReaccionDano = 0;
+            fotogramasVelocidad = 0;
+            Velocidad = VelocidadNormal;
 
             // Reiniciar salto
             EnElSuelo = true;
@@ -220,6 +263,7 @@ namespace PixelEsGUI
         public void Aterrizar()
         {
             ActualizarInvulnerabilidad();
+            ActualizarVelocidadTemporal();
 
             if (EnElSuelo && !HaySueloBajoLosPies())
             {

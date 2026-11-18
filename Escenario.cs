@@ -1,4 +1,4 @@
-using Engine2D;
+﻿using Engine2D;
 
 namespace PixelEsGUI
 {
@@ -29,7 +29,22 @@ namespace PixelEsGUI
 
         // Teclas que están presionadas en este momento.
         bool izquierda, derecha, salto;
+        bool pausado = false;
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
+        readonly System.Windows.Forms.Timer timerRespawn = new System.Windows.Forms.Timer { Interval = 520 };
+        bool respawnPendiente = false;
+
+        // Interfaz superpuesta: vidas y paneles de pausa/fin de partida.
+        readonly Label lblVidas = new Label();
+        readonly Label lblPowerUps = new Label();
+        readonly Panel panelEstado = new Panel();
+        readonly Label lblTituloEstado = new Label();
+        readonly Label lblMensajeEstado = new Label();
+        readonly Button btnEstado = new Button();
+        bool escudoAnterior;
+        bool velocidadAnterior;
+        string avisoTemporalPowerUp = "";
+        readonly System.Windows.Forms.Timer timerAvisoPowerUp = new System.Windows.Forms.Timer { Interval = 1800 };
 
         public Escenario()
         {
@@ -49,7 +64,7 @@ namespace PixelEsGUI
             Visor.Scene = scene;
             Visor.Dock = DockStyle.Fill;
 
-
+            ConfigurarInterfaz();
 
             jugador = new Jugador(100, Suelo - 88);
             scene.AddItem(jugador);
@@ -65,9 +80,7 @@ namespace PixelEsGUI
 
                 if (nivelActual == 3)
                 {
-                    juegoTerminado = true;
-                    bucleJuego.Stop();
-
+                    MostrarVictoria();
                 }
                 else
                 {
@@ -109,11 +122,16 @@ namespace PixelEsGUI
             KeyPreview = true;
             KeyDown += (s, e) =>
             {
-                if (e.KeyCode == Keys.R)
+                if (e.KeyCode == Keys.P)
+                {
+                    AlternarPausa();
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.R && !juegoTerminado && !respawnPendiente)
                 {
                     ReiniciarNivel();
                 }
-                else
+                else if (!pausado && !juegoTerminado)
                 {
                     CambiarTecla(e.KeyCode, true);
                 }
@@ -121,13 +139,238 @@ namespace PixelEsGUI
             KeyUp += (s, e) => CambiarTecla(e.KeyCode, false);
 
             // Un paso de lógica por fotograma: mover -> saltar -> aterrizar (ver Jugador.Saltar).
-            bucleJuego.Tick += (s, e) => PasoDeJuego();
+            bucleJuego.Tick += (s, e) =>
+            {
+                PasoDeJuego();
+                ActualizarAvisosPowerUp();
+            };
+            timerAvisoPowerUp.Tick += (s, e) =>
+            {
+                timerAvisoPowerUp.Stop();
+                avisoTemporalPowerUp = "";
+                ActualizarAvisosPowerUp();
+            };
+            timerRespawn.Tick += (s, e) =>
+            {
+                timerRespawn.Stop();
+                respawnPendiente = false;
+                if (!juegoTerminado)
+                {
+                    CargarNivel(nivelActual, puntoControlGuardado);
+                    ActualizarIndicadorVidas();
+                }
+            };
 
             this.Shown += (s, e) =>
             {
                 Visor.Start();
                 bucleJuego.Start();
             };
+        }
+
+        void ConfigurarInterfaz()
+        {
+            // El visor es el padre de estos controles: BackColor=Transparent permite
+            // que el fondo del juego se vea detrás del contador.
+            lblVidas.AutoSize = true;
+            lblVidas.Font = new Font("Segoe UI", 22, FontStyle.Bold);
+            lblVidas.ForeColor = Color.Crimson;
+            lblVidas.BackColor = Color.Transparent;
+            lblVidas.Padding = new Padding(2);
+            lblVidas.Location = new Point(12, 8);
+            lblVidas.Text = "♥ ♥ ♥";
+            Visor.Controls.Add(lblVidas);
+
+            lblPowerUps.AutoSize = false;
+            lblPowerUps.Size = new Size(260, 58);
+            lblPowerUps.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            lblPowerUps.ForeColor = Color.White;
+            lblPowerUps.BackColor = Color.FromArgb(150, 25, 35, 45);
+            lblPowerUps.Padding = new Padding(8, 5, 8, 5);
+            lblPowerUps.TextAlign = ContentAlignment.MiddleLeft;
+            lblPowerUps.Location = new Point(14, 58);
+            lblPowerUps.Visible = false;
+            Visor.Controls.Add(lblPowerUps);
+
+            // Panel amplio y con título/mensaje separados para evitar que el texto se recorte.
+            panelEstado.Size = new Size(520, 250);
+            panelEstado.BackColor = Color.Gainsboro;
+            panelEstado.BorderStyle = BorderStyle.FixedSingle;
+            panelEstado.Location = new Point((ClientSize.Width - panelEstado.Width) / 2,
+                                             (ClientSize.Height - panelEstado.Height) / 2);
+            panelEstado.Visible = false;
+
+            lblTituloEstado.Dock = DockStyle.Top;
+            lblTituloEstado.Height = 66;
+            lblTituloEstado.TextAlign = ContentAlignment.MiddleCenter;
+            lblTituloEstado.ForeColor = Color.Firebrick;
+            lblTituloEstado.Font = new Font("Segoe UI", 23, FontStyle.Bold);
+            lblTituloEstado.Padding = new Padding(12, 8, 12, 2);
+
+            lblMensajeEstado.Dock = DockStyle.Top;
+            lblMensajeEstado.Height = 105;
+            lblMensajeEstado.TextAlign = ContentAlignment.MiddleCenter;
+            lblMensajeEstado.ForeColor = Color.FromArgb(35, 35, 35);
+            lblMensajeEstado.Font = new Font("Segoe UI", 15, FontStyle.Bold);
+            lblMensajeEstado.Padding = new Padding(24, 4, 24, 4);
+            lblMensajeEstado.AutoEllipsis = true;
+
+            btnEstado.Text = "Volver a jugar";
+            btnEstado.Size = new Size(190, 44);
+            btnEstado.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            btnEstado.Location = new Point((panelEstado.Width - btnEstado.Width) / 2, 190);
+            btnEstado.BackColor = Color.White;
+            btnEstado.ForeColor = Color.FromArgb(30, 30, 30);
+            btnEstado.FlatStyle = FlatStyle.Flat;
+            btnEstado.Click += (s, e) =>
+            {
+                if (pausado) BtnReanudar_Click(s, e);
+                else ReiniciarPartidaCompleta();
+            };
+
+            panelEstado.Controls.Add(lblMensajeEstado);
+            panelEstado.Controls.Add(lblTituloEstado);
+            panelEstado.Controls.Add(btnEstado);
+            Controls.Add(panelEstado);
+            panelEstado.BringToFront();
+            lblVidas.BringToFront();
+            lblPowerUps.BringToFront();
+        }
+
+        void ActualizarIndicadorVidas()
+        {
+            if (jugador == null) return;
+            int vidas = Math.Max(0, Math.Min(3, jugador.Vida));
+            lblVidas.Text = string.Join(" ", Enumerable.Repeat("♥", vidas));
+            if (vidas == 0) lblVidas.Text = "";
+        }
+
+        void ActualizarAvisosPowerUp()
+        {
+            if (jugador == null || lblPowerUps.IsDisposed) return;
+
+            bool escudo = jugador.TieneEscudo;
+            bool velocidad = jugador.TieneVelocidad;
+
+            if (escudo && !escudoAnterior)
+            {
+                avisoTemporalPowerUp = "🛡 ¡Escudo activado! Absorbe un impacto.";
+                timerAvisoPowerUp.Stop();
+                timerAvisoPowerUp.Start();
+            }
+            else if (!escudo && escudoAnterior)
+            {
+                avisoTemporalPowerUp = "🛡 Escudo perdido: protegió un impacto.";
+                timerAvisoPowerUp.Stop();
+                timerAvisoPowerUp.Start();
+            }
+
+            if (velocidad && !velocidadAnterior)
+            {
+                avisoTemporalPowerUp = "⚡ ¡Velocidad aumentada!";
+                timerAvisoPowerUp.Stop();
+                timerAvisoPowerUp.Start();
+            }
+            else if (!velocidad && velocidadAnterior)
+            {
+                avisoTemporalPowerUp = "⚡ La mejora de velocidad terminó.";
+                timerAvisoPowerUp.Stop();
+                timerAvisoPowerUp.Start();
+            }
+
+            escudoAnterior = escudo;
+            velocidadAnterior = velocidad;
+
+            var estados = new List<string>();
+            if (escudo) estados.Add("🛡 Escudo activo");
+            if (velocidad) estados.Add("⚡ Velocidad activa");
+            if (estados.Count > 0)
+            {
+                lblPowerUps.Text = string.Join("\n", estados);
+                lblPowerUps.Height = estados.Count == 2 ? 58 : 34;
+                lblPowerUps.Visible = true;
+            }
+            else if (!string.IsNullOrWhiteSpace(avisoTemporalPowerUp))
+            {
+                lblPowerUps.Text = avisoTemporalPowerUp;
+                lblPowerUps.Height = 42;
+                lblPowerUps.Visible = true;
+            }
+            else
+            {
+                lblPowerUps.Visible = false;
+            }
+            lblPowerUps.BringToFront();
+        }
+
+        void MostrarPanelEstado(string titulo, string mensaje, string textoBoton)
+        {
+            lblTituloEstado.Text = titulo;
+            lblMensajeEstado.Text = mensaje;
+            btnEstado.Text = textoBoton;
+            panelEstado.Visible = true;
+            panelEstado.BringToFront();
+            lblVidas.BringToFront();
+            lblPowerUps.BringToFront();
+        }
+
+        void MostrarVictoria()
+        {
+            juegoTerminado = true;
+            pausado = false;
+            bucleJuego.Stop();
+            MostrarPanelEstado("¡VICTORIA!", "¡Felicitaciones! Completaste los tres niveles de Pixel Escape.", "Jugar nuevamente");
+        }
+
+        void ReiniciarPartidaCompleta()
+        {
+            timerTransicion.Stop();
+            timerRespawn.Stop();
+            respawnPendiente = false;
+            bucleJuego.Stop();
+            izquierda = derecha = salto = false;
+            pausado = false;
+            juegoTerminado = false;
+            transicionEnCurso = false;
+            panelEstado.Visible = false;
+            jugador.ReiniciarPartida();
+            escudoAnterior = false;
+            velocidadAnterior = false;
+            avisoTemporalPowerUp = "";
+            lblPowerUps.Visible = false;
+            puntoControlGuardado = false;
+            indicesRecogidos.Clear();
+            puntajeCheckpoint = 0;
+            nivelActual = 1;
+            CargarNivel(1, false);
+            ActualizarIndicadorVidas();
+            bucleJuego.Start();
+            Visor.Focus();
+        }
+
+        void AlternarPausa()
+        {
+            if (juegoTerminado || transicionEnCurso) return;
+            pausado = !pausado;
+            izquierda = derecha = salto = false;
+            if (pausado)
+            {
+                bucleJuego.Stop();
+                MostrarPanelEstado("JUEGO EN PAUSA", "Pulsa P o el botón para continuar.", "Reanudar");
+            }
+            else
+            {
+                panelEstado.Visible = false;
+                bucleJuego.Start();
+            }
+        }
+
+        void BtnReanudar_Click(object? sender, EventArgs e)
+        {
+            pausado = false;
+            panelEstado.Visible = false;
+            bucleJuego.Start();
+            Visor.Focus();
         }
 
         // ---------- Obstáculos de terreno (tileset.png) ----------
@@ -339,8 +582,16 @@ namespace PixelEsGUI
         void PasoDeJuego()
         {
             // No continuar mientras se cambia de nivel
-            if (transicionEnCurso || juegoTerminado)
+            if (transicionEnCurso || juegoTerminado || pausado)
                 return;
+
+            if (respawnPendiente)
+            {
+                jugador.Aterrizar(); // mantiene la animación de daño mientras espera la reaparición
+                return;
+            }
+
+            ActualizarIndicadorVidas();
 
             // Los enemigos patrullan continuamente dentro de su zona.
             ActualizarPatrullas();
@@ -652,19 +903,23 @@ namespace PixelEsGUI
         // Si ya se activó el punto de control, el jugador reaparece ahí; si no, al inicio.
         void ResolverImpacto()
         {
+            izquierda = derecha = salto = false;
+            ActualizarIndicadorVidas();
+
             if (!jugador.EstaVivo)
             {
-                // Al perder la tercera vida se reinicia toda la partida.
-                jugador.ReiniciarPartida();
-                puntoControlGuardado = false;
-                indicesRecogidos.Clear();
-                puntajeCheckpoint = 0;
-                CargarNivel(1, false);
+                // La partida queda detenida hasta que el usuario pulse el botón de reinicio.
+                juegoTerminado = true;
+                bucleJuego.Stop();
+                MostrarPanelEstado("GAME OVER", "Has perdido tus tres vidas.", "Volver a jugar");
             }
             else
             {
-                // Con vidas restantes vuelve al checkpoint o al inicio del nivel.
-                CargarNivel(nivelActual, puntoControlGuardado);
+                // Se conserva visible la reacción de daño antes de reaparecer.
+                respawnPendiente = true;
+                bucleJuego.Start();
+                timerRespawn.Stop();
+                timerRespawn.Start();
             }
         }
 
@@ -726,6 +981,7 @@ namespace PixelEsGUI
             AgregarLlaveSobrePlataforma(1650, 3);     // LLAVE sobre plataforma (x 1650-1746): hay que subirse
 
             AgregarGuardian(1900);                    // guardián 2 (x 1884-2012)
+            AgregarColeccionable(new PowerUpVelocidad(2070, 0, 10), 2070); // velocidad temporal antes del último tramo
 
             AgregarCazador(2200);                     // cazador 2 (x 2200-2296)
 
