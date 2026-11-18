@@ -366,7 +366,10 @@ namespace PixelEsGUI
                 {
                     if (cuerpoJugador.IntersectsWith(CuerpoCazador(c)))
                     {
-                        evitoCazador = false;
+                        if (!jugador.AbsorbeImpacto())
+                        {
+                            evitoCazador = false; // sin escudo: tocarlo hace perder el nivel
+                        }
                     }
                 }
 
@@ -374,15 +377,26 @@ namespace PixelEsGUI
                 {
                     if (cuerpoJugador.IntersectsWith(CuerpoGuardian(g)))
                     {
-                        evitoGuardian = false;
+                        if (!jugador.AbsorbeImpacto())
+                        {
+                            evitoGuardian = false; // sin escudo: tocarlo hace perder el nivel
+                        }
                     }
                 }
             }
 
-            // Activar punto de control
-            if (jugador.ColisionaCon(puntoControl))
+            // Tocar a un enemigo = perder el nivel
+            if (nivelActual >= 2 && (!evitoCazador || !evitoGuardian))
+            {
+                PerderNivel();
+                return;
+            }
+
+            // Activar punto de control: la primera vez guarda la posición y el progreso
+            if (!puntoControl.Activo && jugador.ColisionaCon(puntoControl))
             {
                 puntoControl.Activar(jugador);
+                GuardarPuntoControl();
             }
 
             // Comprobar si puede abrir la puerta
@@ -392,6 +406,12 @@ namespace PixelEsGUI
             foreach (Trampa t in trampas)
             {
                 t.Activar(jugador);
+            }
+
+            // Sin vidas = perder el nivel
+            if (!jugador.EstaVivo)
+            {
+                PerderNivel();
             }
         }
 
@@ -453,6 +473,12 @@ namespace PixelEsGUI
             return jugadorRect.IntersectsWith(puertaRect);
         }
 
+        // ---------- Punto de control ----------
+        const int VidaInicial = 3;
+        bool puntoControlGuardado;                                   // true si ya se activó en este nivel
+        int xRespawn;                                                // X donde reaparece el jugador
+        readonly List<int> indicesRecogidos = new List<int>();       // coleccionables que ya tenía al activarlo
+
         // Control de niveles
         int nivelActual = 1;
 
@@ -470,9 +496,17 @@ namespace PixelEsGUI
 
 
         //Método para cargar un nuevo nivel: quita los objetos del nivel anterior y crea los del nuevo.
-        void CargarNivel(int nuevoNivel)
+        // desdePuntoControl = true: el nivel se reinicia pero el jugador reaparece en el punto de control.
+        void CargarNivel(int nuevoNivel, bool desdePuntoControl = false)
         {
             nivelActual = nuevoNivel;
+
+            // Nivel nuevo o reinicio con R: se olvida el punto de control anterior
+            if (!desdePuntoControl)
+            {
+                puntoControlGuardado = false;
+                indicesRecogidos.Clear();
+            }
 
             monedasRecogidas = 0;
 
@@ -534,9 +568,15 @@ namespace PixelEsGUI
             CrearSuelo();
             CrearDisposicionNivel();
 
-            // Reiniciar al jugador
-            jugador.ReiniciarEstado(100, 100);
+            // Reiniciar al jugador: en el punto de control si venimos de una derrota, si no en el inicio
+            int xInicio = desdePuntoControl ? xRespawn : 100;
+            jugador.ReiniciarEstado(xInicio, 100);
             jugador.Visible = true;
+            jugador.GanarVida(VidaInicial - jugador.Vida); // vida completa
+            if (desdePuntoControl)
+            {
+                RestaurarProgresoGuardado();
+            }
 
             // La cámara vuelve al inicio del nivel
             ActualizarCamara();
@@ -554,6 +594,52 @@ namespace PixelEsGUI
             puntoControl.SetPos(xControl, Suelo - (int)puntoControl.Alto);
             puntoControl.ZValue = -1;
             scene.AddItem(puntoControl);
+
+            if (desdePuntoControl)
+            {
+                puntoControl.Activar(jugador); // la bandera ya aparece levantada
+            }
+        }
+
+        // Guarda dónde reaparecer (en la bandera) y qué monedas/llave llevaba el jugador.
+        void GuardarPuntoControl()
+        {
+            puntoControlGuardado = true;
+            xRespawn = puntoControl.X - 16; // el cuerpo del jugador queda sobre la bandera
+
+            indicesRecogidos.Clear();
+            for (int i = 0; i < coleccionables.Count; i++)
+            {
+                if (coleccionables[i].Recogido)
+                {
+                    indicesRecogidos.Add(i);
+                }
+            }
+        }
+
+        // Tras recargar el nivel, vuelve a marcar como recogido lo que ya tenía al activar el punto de control.
+        // (Los objetos se crean siempre en el mismo orden, por eso el índice identifica a cada uno.)
+        void RestaurarProgresoGuardado()
+        {
+            foreach (int i in indicesRecogidos)
+            {
+                if (i < coleccionables.Count)
+                {
+                    coleccionables[i].Recoger(jugador);
+                    if (coleccionables[i] is Moneda)
+                    {
+                        monedasRecogidas++;
+                    }
+                }
+            }
+        }
+
+        // Derrota (tocar un enemigo o quedarse sin vidas): el nivel se reinicia por completo
+        // (enemigos, trampas, monedas y llave posteriores al punto de control, vida y objetivos).
+        // Si ya se activó el punto de control, el jugador reaparece ahí; si no, al inicio.
+        void PerderNivel()
+        {
+            CargarNivel(nivelActual, puntoControlGuardado);
         }
 
         // =====================================================================================

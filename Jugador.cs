@@ -44,6 +44,13 @@ namespace PixelEsGUI
         // ---------- Propiedades ----------
         public int Puntaje { get; private set; }
         public bool TieneLlave { get; private set; }
+        public bool TieneEscudo { get; private set; }
+
+        // Tras romperse el escudo el jugador es invulnerable un instante (60 fotogramas ~ 1 s),
+        // para que un enemigo que lo sigue tocando no lo mate en el fotograma siguiente.
+        const int FotogramasInvulnerable = 60;
+        int fotogramasInvulnerable;
+        public bool Invulnerable => fotogramasInvulnerable > 0;
         public bool EnElSuelo { get; private set; } = true;
         public bool SaltoParabolico { get; private set; }
         public double VelY { get; private set; }     // velocidad vertical (positiva = subiendo)
@@ -69,12 +76,55 @@ namespace PixelEsGUI
             TieneLlave = true;
         }
 
+        // El escudo absorbe UN impacto: no se pierde vida y el nivel no se reinicia.
+        public void ActivarEscudo()
+        {
+            TieneEscudo = true;
+        }
+
+        // true si el impacto queda absorbido (invulnerable o escudo). El escudo se gasta al absorber.
+        public bool AbsorbeImpacto()
+        {
+            if (Invulnerable)
+            {
+                return true;
+            }
+            if (TieneEscudo)
+            {
+                TieneEscudo = false;
+                fotogramasInvulnerable = FotogramasInvulnerable;
+                return true;
+            }
+            return false;
+        }
+
+        public override void RecibirDano(int dano)
+        {
+            if (AbsorbeImpacto())
+            {
+                return; // la vida queda igual que antes del impacto
+            }
+            base.RecibirDano(dano);
+        }
+
+        // Una vez por fotograma: cuenta la invulnerabilidad y hace parpadear al jugador.
+        void ActualizarInvulnerabilidad()
+        {
+            if (fotogramasInvulnerable > 0)
+            {
+                fotogramasInvulnerable--;
+                Visible = fotogramasInvulnerable == 0 || (fotogramasInvulnerable / 4) % 2 == 0;
+            }
+        }
+
         //Para perder la llave cuando el jugador muere, se reinicia el juego y pierde la llave que tenía, tambien para cuando inicia un nuevo nivel, se reinicia el juego y pierde la llave que tenía
 
         public void ReiniciarEstado(int x, int y)
         {
-            // Reiniciar llave
+            // Reiniciar llave y escudo
             TieneLlave = false;
+            TieneEscudo = false;
+            fotogramasInvulnerable = 0;
 
             // Reiniciar salto
             EnElSuelo = true;
@@ -155,6 +205,8 @@ namespace PixelEsGUI
         // - Parado en el suelo: si ya no hay nada bajo los pies (se salió del borde), empieza a caer.
         public void Aterrizar()
         {
+            ActualizarInvulnerabilidad();
+
             if (EnElSuelo && !HaySueloBajoLosPies())
             {
                 EmpezarCaida();

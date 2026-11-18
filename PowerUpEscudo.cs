@@ -1,6 +1,6 @@
 namespace PixelEsGUI
 {
-    // Protege al jugador de un impacto (le da una vida extra).
+    // Protege al jugador de UN impacto (trampa o enemigo): no pierde vida ni vuelve al punto de control.
     internal class PowerUpEscudo : PowerUpTemporal
     {
         const int CuadroEscudo = 0; // burbuja con escudo
@@ -11,7 +11,7 @@ namespace PixelEsGUI
 
         protected override void AplicarEfecto(Jugador jugador)
         {
-            jugador.GanarVida(1);
+            jugador.ActivarEscudo();
         }
     }
 }
