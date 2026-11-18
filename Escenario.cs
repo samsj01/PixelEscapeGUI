@@ -19,6 +19,12 @@ namespace PixelEsGUI
         // Altura del "suelo" donde se apoyan los objetos (la base de cada sprite queda en esta Y).
         const int Suelo = 190;
 
+        // ---------- Cámara ----------
+        // Ancho TOTAL de cada nivel en píxeles (posición 0 = nivel 1). La ventana solo muestra
+        // scene.Width (920 px) de ese ancho; la cámara (scene.CamaraX) decide qué parte se ve.
+        readonly int[] anchoNiveles = { 1840, 2760, 3680 };
+        int AnchoNivel => anchoNiveles[nivelActual - 1];
+
         // Teclas que están presionadas en este momento.
         bool izquierda, derecha, salto;
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
@@ -27,7 +33,9 @@ namespace PixelEsGUI
         {
 
             InitializeComponent();
-            ClientSize = new Size(920, 490); // más ancho para que quepan todos los objetos
+            ClientSize = new Size(920, 490); // tamaño de la ventana = lo que ve la cámara
+            FormBorderStyle = FormBorderStyle.FixedSingle; // scene.Width debe coincidir con la ventana,
+            MaximizeBox = false;                           // por eso no se deja redimensionar
             StartPosition = FormStartPosition.CenterScreen;
             scene = new GraphicsScene
             {
@@ -181,7 +189,7 @@ namespace PixelEsGUI
             int[] columnasCesped = { 1, 3, 5 };                                   // 3 variantes de césped (fila 1)
             int[,] tierra = { { 3, 1 }, { 3, 5 }, { 5, 1 }, { 5, 3 }, { 5, 5 } }; // 5 variantes de tierra
 
-            int columnas = ClientSize.Width / Bloque.Tamano + 1;
+            int columnas = AnchoNivel / Bloque.Tamano + 1;
             int filas = (ClientSize.Height - Suelo) / Bloque.Tamano + 1;
 
             for (int c = 0; c < columnas; c++)
@@ -211,6 +219,9 @@ namespace PixelEsGUI
             {
                 AgregarBloque(x + i * Bloque.Tamano, y, 1, 7);
             }
+
+            // Se registra como superficie sólida: el jugador se para encima y no la atraviesa.
+            jugador.Plataformas.Add(new Rectangle(x, y, cantidad * Bloque.Tamano, Bloque.Tamano));
         }
 
         void AgregarColeccionable(Coleccionables item, int x)
@@ -264,6 +275,10 @@ namespace PixelEsGUI
 
             jugador.Aterrizar();
 
+            // La cámara sigue al jugador y este no se sale de los bordes del nivel
+            LimitarJugadorAlNivel();
+            ActualizarCamara();
+
             // Recoger monedas y otros coleccionables
             foreach (Coleccionables item in coleccionables)
             {
@@ -308,10 +323,41 @@ namespace PixelEsGUI
         }
 
 
+        // Evita que el jugador salga del nivel por la izquierda o por la derecha.
+        void LimitarJugadorAlNivel()
+        {
+            Rectangle cuerpo = jugador.Cuerpo;
+
+            if (cuerpo.Left < 0)
+            {
+                jugador.SetPos(jugador.X - cuerpo.Left, jugador.Y);
+            }
+            else if (cuerpo.Right > AnchoNivel)
+            {
+                jugador.SetPos(jugador.X - (cuerpo.Right - AnchoNivel), jugador.Y);
+            }
+        }
+
+        // Centra la cámara en el jugador, sin mostrar nada fuera del nivel:
+        //   CamaraX = 0                      -> se ve el inicio del nivel
+        //   CamaraX = AnchoNivel - scene.Width -> se ve el final del nivel
+        // El motor dibuja todo desplazado -CamaraX, así que las posiciones de los objetos
+        // siguen siendo las del MUNDO (no hay que convertirlas a coordenadas de pantalla).
+        void ActualizarCamara()
+        {
+            Rectangle cuerpo = jugador.Cuerpo;
+            float centroJugador = cuerpo.X + cuerpo.Width / 2f;
+
+            float maxCamara = Math.Max(0f, AnchoNivel - scene.Width);
+            float camara = Math.Clamp(centroJugador - scene.Width / 2f, 0f, maxCamara);
+
+            scene.CamaraX = (float)Math.Round(camara); // entero: evita líneas finas entre bloques
+        }
+
         // Rectángulos del cuerpo REAL de cada personaje. Los cuadros de las hojas de sprites
         // (96x128 el jugador, 96x96 los enemigos) tienen mucho espacio transparente; colisionar
         // con el cuadro completo hace que "tocar" al enemigo ocurra a ~50 px de distancia.
-        Rectangle CuerpoJugador() => new Rectangle(jugador.X + 32, jugador.Y + 36, 34, 52);
+        Rectangle CuerpoJugador() => jugador.Cuerpo;
         Rectangle CuerpoGuardian() => new Rectangle(guardian.X + 24, guardian.Y + 23, 48, 46);
         Rectangle CuerpoCazador() => new Rectangle(cazador.X + 27, cazador.Y + 23, 42, 45);
 
@@ -368,6 +414,7 @@ namespace PixelEsGUI
             foreach (Coleccionables item in coleccionables)
             {
                 item.Visible = false;
+                scene.RemoveItem(item); // si solo se oculta, la escena acumula objetos en cada reinicio
             }
 
             coleccionables.Clear();
@@ -376,18 +423,29 @@ namespace PixelEsGUI
             foreach (Bloque bloque in bloques)
             {
                 bloque.Visible = false;
+                scene.RemoveItem(bloque);
             }
 
             bloques.Clear();
+            jugador.Plataformas.Clear();
 
             if (puerta != null)
+            {
                 puerta.Visible = false;
+                scene.RemoveItem(puerta);
+            }
 
             if (puntoControl != null)
+            {
                 puntoControl.Visible = false;
+                scene.RemoveItem(puntoControl);
+            }
 
             if (trampa != null)
+            {
                 trampa.Visible = false;
+                scene.RemoveItem(trampa);
+            }
 
 
             // Construir el terreno del nivel (el suelo es igual en todos; las plataformas cambian)
@@ -395,14 +453,21 @@ namespace PixelEsGUI
 
             if (nivelActual >= 2)
             {
-                // Una plataforma para cada enemigo (guardián en x=300, cazador en x=520).
-                CrearPlataforma(300, Suelo - 64, 3);
-                CrearPlataforma(520, Suelo - 64, 3);
+                // Cada enemigo queda en el suelo, justo DEBAJO de una plataforma. El jugador debe subirse
+                // a la plataforma (se salta desde un lado) para pasar por encima sin tocarlo.
+                // Alto de la plataforma: su borde de abajo (Suelo - 86 + 32 = 136) queda por encima de la
+                // cabeza del enemigo (143) y a la altura de la cabeza del jugador, así se puede caminar debajo.
+                int ySuperficie = Suelo - 86;
+                CrearPlataforma(205, ySuperficie, 4); // sobre el guardián (x = 205..333)
+                CrearPlataforma(395, ySuperficie, 3); // sobre el cazador  (x = 395..491)
             }
 
             // Reiniciar al jugador
             jugador.ReiniciarEstado(100, 100);
             jugador.Visible = true;
+
+            // La cámara vuelve al inicio del nivel
+            ActualizarCamara();
 
             // Mostrar enemigos solamente en niveles 2 y 3
             bool enemigosActivos = nivelActual >= 2;
@@ -410,15 +475,17 @@ namespace PixelEsGUI
             cazador.Visible = enemigosActivos;
             guardian.Visible = enemigosActivos;
 
-            // Los enemigos se paran sobre las plataformas (su borde superior está en Suelo - 64).
-            // Los pies quedan a 68-69 px del borde superior del cuadro de 96x96 del sprite.
-            guardian.SetPos(300, Suelo - 64 - 69);
-            cazador.SetPos(520, Suelo - 64 - 68);
+            // Los enemigos quedan en el suelo (pies a ~189), centrados bajo cada plataforma:
+            // centro del cuerpo = X + 48  ->  221 + 48 = 269 (plataforma 205..333), 395 + 48 = 443 (395..491).
+            guardian.SetPos(221, 120);
+            cazador.SetPos(395, 120);
 
             // Crear la nueva puerta
-            puerta = new Puerta(780, 0);
+            // La puerta va cerca del final del nivel (el nivel ya no mide 920 px)
+            int xPuerta = AnchoNivel - 140;
+            puerta = new Puerta(xPuerta, 0);
             puerta.SetPos(
-                780,
+                xPuerta,
                 Suelo - (int)puerta.Alto
             );
 

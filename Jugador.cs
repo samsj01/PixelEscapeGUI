@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace PixelEsGUI
 {
@@ -35,7 +37,8 @@ namespace PixelEsGUI
         double angulo;
         int movimientoHorizontal;  // -1 izquierda, 0 quieto, 1 derecha (solo en el fotograma actual)
         int origenX;
-        int sueloY;
+        double sueloY;             // altura (Y) de la que parte la parábola actual
+        int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
         double tiempoVuelo;
 
         // ---------- Propiedades ----------
@@ -45,12 +48,13 @@ namespace PixelEsGUI
         public bool SaltoParabolico { get; private set; }
         public double VelY { get; private set; }     // velocidad vertical (positiva = subiendo)
         public int FuerzaSalto => FuerzaSaltoBase;
-        public double VelSalto { get; protected set; } = 5;
+        public double VelSalto { get; protected set; } = 7; // 7 * 4 = 28 -> sube ~98 px (antes 5 -> ~50 px)
 
         public Jugador(int x, int y) : base(x, y, "Jugador", ColumnasHoja, FilasHoja, FpsQuieto)
         {
             Vida = 3;
             Dano = 1;
+            sueloBaseY = y;
             ActualizarAnimacion(false);
         }
 
@@ -83,6 +87,7 @@ namespace PixelEsGUI
 
             // Reiniciar posición
             sueloY = y;
+            sueloBaseY = y;
             SetPos(x, y);
 
             // Volver a mostrar el personaje
@@ -97,16 +102,29 @@ namespace PixelEsGUI
         // ---------- Movimiento ----------
         // En el aire el desplazamiento lo controla el salto; en el suelo se mueve normal
         // y se recuerda la dirección para decidir el tipo de salto.
+        // Si el paso lo metería dentro de una plataforma, se deshace (los bloques no se atraviesan de lado).
         public override bool MoverIzq()
         {
             movimientoHorizontal = 3;
-            return base.MoverIzq();
+            int xAntes = X;
+            bool seMovio = base.MoverIzq();
+            if (ChocaConPlataforma())
+            {
+                SetPos(xAntes, Y);
+            }
+            return seMovio;
         }
 
         public override bool MoverDer()
         {
             movimientoHorizontal = 3;
-            return base.MoverDer();
+            int xAntes = X;
+            bool seMovio = base.MoverDer();
+            if (ChocaConPlataforma())
+            {
+                SetPos(xAntes, Y);
+            }
+            return seMovio;
         }
 
         // ---------- Salto ----------
@@ -130,41 +148,60 @@ namespace PixelEsGUI
             EnElSuelo = false;
         }
 
-        // Avanza un fotograma: sube y baja por la gravedad y aterriza al volver
-        // a la altura de la que despegó. Se llama una vez por fotograma.
-        //   x(t) = origenX + velx * t
+        // Avanza un fotograma del salto o de la caída. Se llama una vez por fotograma.
         //   y(t) = sueloY - (v0y * t - 1/2 * gravedad * t^2)   (el eje Y crece hacia abajo)
+        // - Subiendo: si la cabeza llega al borde de abajo de una plataforma, rebota y empieza a caer.
+        // - Bajando: aterriza en lo primero que cruce con los pies (tope de una plataforma o suelo principal).
+        // - Parado en el suelo: si ya no hay nada bajo los pies (se salió del borde), empieza a caer.
         public void Aterrizar()
         {
+            if (EnElSuelo && !HaySueloBajoLosPies())
+            {
+                EmpezarCaida();
+            }
+
             if (!EnElSuelo)
             {
                 double velInicialY = VelSalto * FuerzaSalto;
-                double duracionVuelo = 2 * velInicialY / Gravedad;
+                int piesAntes = PiesY;
+                int cabezaAntes = Y + CuerpoY;
 
                 tiempoVuelo += Tiempo;
-                bool aterriza = tiempoVuelo >= duracionVuelo;
-                if (aterriza)
-                {
-                    tiempoVuelo = duracionVuelo;
-                }
-
-                // Simulación de la parábola solo en el eje Y (respetando la X actual del jugador)
                 double altura = velInicialY * tiempoVuelo - 0.5 * Gravedad * tiempoVuelo * tiempoVuelo;
-                int nuevaY = aterriza ? sueloY : (int)Math.Round(sueloY - altura);
+                int nuevaY = (int)Math.Round(sueloY - altura);
+                VelY = velInicialY - Gravedad * tiempoVuelo;
 
-                // Se mantiene la X actual para no bloquear el control horizontal del jugador
-                SetPos(X, nuevaY);
-
-                if (aterriza)
+                if (VelY > 0)
                 {
-                    EnElSuelo = true;
-                    SaltoParabolico = false;
-                    velx = 0;
-                    VelY = 0;
+                    // Subiendo: ¿choca la cabeza con el borde inferior de una plataforma?
+                    int techo = BuscarTecho(cabezaAntes, nuevaY + CuerpoY);
+                    if (techo != SinSuperficie)
+                    {
+                        SetPos(X, techo - CuerpoY);
+                        EmpezarCaida();
+                        VelY = 0;
+                    }
+                    else
+                    {
+                        SetPos(X, nuevaY);
+                    }
                 }
                 else
                 {
-                    VelY = velInicialY - Gravedad * tiempoVuelo;
+                    // Bajando: ¿cruzan los pies el tope de una plataforma o el suelo?
+                    int superficie = BuscarSuperficie(piesAntes, nuevaY + PiesOffset);
+                    if (superficie != SinSuperficie)
+                    {
+                        SetPos(X, superficie - PiesOffset);
+                        EnElSuelo = true;
+                        SaltoParabolico = false;
+                        velx = 0;
+                        VelY = 0;
+                    }
+                    else
+                    {
+                        SetPos(X, nuevaY);
+                    }
                 }
             }
 
@@ -173,6 +210,100 @@ namespace PixelEsGUI
 
             // Reiniciamos el registro de entrada horizontal del fotograma
             movimientoHorizontal = 0;
+        }
+
+        // ---------- Plataformas (bloques sólidos) ----------
+        // Cuerpo REAL del jugador dentro de su cuadro de 96x128 (el resto es espacio transparente).
+        const int CuerpoX = 32;
+        const int CuerpoY = 36;
+        const int CuerpoAncho = 34;
+        const int CuerpoAlto = 52;
+        const int PiesOffset = CuerpoY + CuerpoAlto; // distancia del borde superior del cuadro a los pies (88)
+        const int SinSuperficie = int.MinValue;
+
+        public Rectangle Cuerpo => new Rectangle(X + CuerpoX, Y + CuerpoY, CuerpoAncho, CuerpoAlto);
+        public int PiesY => Y + PiesOffset;
+
+        // Rectángulos de las plataformas del nivel (los llena Escenario). El suelo principal no va aquí.
+        public List<Rectangle> Plataformas { get; } = new List<Rectangle>();
+
+        bool ChocaConPlataforma()
+        {
+            Rectangle cuerpo = Cuerpo;
+            foreach (Rectangle plataforma in Plataformas)
+            {
+                if (cuerpo.IntersectsWith(plataforma))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // true si el cuerpo está (aunque sea un poco) encima o debajo de la plataforma, en horizontal.
+        bool SolapaEnX(Rectangle plataforma)
+        {
+            int izquierda = X + CuerpoX;
+            int derecha = izquierda + CuerpoAncho;
+            return izquierda < plataforma.Right && derecha > plataforma.Left;
+        }
+
+        bool HaySueloBajoLosPies()
+        {
+            if (PiesY >= sueloBaseY + PiesOffset)
+            {
+                return true; // suelo principal
+            }
+            foreach (Rectangle plataforma in Plataformas)
+            {
+                if (plataforma.Top == PiesY && SolapaEnX(plataforma))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Devuelve la Y (de los pies) de la superficie más alta que los pies cruzaron al bajar, o SinSuperficie.
+        int BuscarSuperficie(int piesAntes, int piesNuevos)
+        {
+            int mejor = int.MaxValue;
+            int sueloPrincipal = sueloBaseY + PiesOffset;
+            if (piesAntes <= sueloPrincipal && piesNuevos >= sueloPrincipal)
+            {
+                mejor = sueloPrincipal;
+            }
+            foreach (Rectangle plataforma in Plataformas)
+            {
+                if (SolapaEnX(plataforma) && piesAntes <= plataforma.Top && piesNuevos >= plataforma.Top && plataforma.Top < mejor)
+                {
+                    mejor = plataforma.Top;
+                }
+            }
+            return mejor == int.MaxValue ? SinSuperficie : mejor;
+        }
+
+        // Devuelve la Y del borde inferior de la plataforma que la cabeza cruzó al subir, o SinSuperficie.
+        int BuscarTecho(int cabezaAntes, int cabezaNueva)
+        {
+            int mejor = SinSuperficie;
+            foreach (Rectangle plataforma in Plataformas)
+            {
+                if (SolapaEnX(plataforma) && cabezaAntes >= plataforma.Bottom && cabezaNueva < plataforma.Bottom && plataforma.Bottom > mejor)
+                {
+                    mejor = plataforma.Bottom;
+                }
+            }
+            return mejor;
+        }
+
+        // Caída libre: se coloca la parábola de modo que su cima (velocidad vertical 0) quede justo aquí.
+        void EmpezarCaida()
+        {
+            double velInicialY = VelSalto * FuerzaSalto;
+            sueloY = Y + velInicialY * velInicialY / (2 * Gravedad);
+            tiempoVuelo = velInicialY / Gravedad;
+            EnElSuelo = false;
         }
 
         // ---------- Animación ----------
