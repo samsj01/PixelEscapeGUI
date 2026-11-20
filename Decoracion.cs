@@ -9,5 +9,13 @@ namespace PixelEsGUI
             FijarTamano(ancho, alto);
             EstablecerRangoFrames(0, 0, false);
         }
+
+        // Decoración tomada de una hoja de sprites: se dibuja solo la celda 'cuadro'.
+        public Decoracion(int x, int y, string recurso, int columnas, int filas, int cuadro, int ancho, int alto)
+            : base(x, y, recurso, columnas, filas, 1f)
+        {
+            FijarTamano(ancho, alto);
+            EstablecerRangoFrames(cuadro, cuadro, false);
+        }
     }
 }

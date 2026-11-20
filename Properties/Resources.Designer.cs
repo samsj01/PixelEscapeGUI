@@ -93,16 +93,6 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Arbusto {
-            get {
-                object obj = ResourceManager.GetObject("Arbusto", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Arbusto_3 {
             get {
                 object obj = ResourceManager.GetObject("Arbusto 3", resourceCulture);
@@ -153,6 +143,16 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap BgNivel2 {
+            get {
+                object obj = ResourceManager.GetObject("BgNivel2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BosqueTiles {
             get {
                 object obj = ResourceManager.GetObject("BosqueTiles", resourceCulture);
@@ -166,16 +166,6 @@ namespace PixelEsGUI.Properties {
         internal static System.Drawing.Bitmap Caja {
             get {
                 object obj = ResourceManager.GetObject("Caja", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Casa {
-            get {
-                object obj = ResourceManager.GetObject("Casa", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -303,9 +293,9 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MiddleBG {
+        internal static System.Drawing.Bitmap Moneda {
             get {
-                object obj = ResourceManager.GetObject("MiddleBG", resourceCulture);
+                object obj = ResourceManager.GetObject("Moneda", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -313,9 +303,19 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Moneda {
+        internal static System.Drawing.Bitmap Nivel2Hoja {
             get {
-                object obj = ResourceManager.GetObject("Moneda", resourceCulture);
+                object obj = ResourceManager.GetObject("Nivel2Hoja", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Nivel2Pinos {
+            get {
+                object obj = ResourceManager.GetObject("Nivel2Pinos", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -433,9 +433,9 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap TileSet {
+        internal static System.Drawing.Bitmap TilesNivel2 {
             get {
-                object obj = ResourceManager.GetObject("TileSet", resourceCulture);
+                object obj = ResourceManager.GetObject("TilesNivel2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

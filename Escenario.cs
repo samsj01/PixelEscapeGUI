@@ -417,6 +417,26 @@ namespace PixelEsGUI
             scene.AddItem(obstaculo);
         }
 
+        // Tile del nivel 2: celda de 64x64 de la hoja "Nivel2Hoja" (8 columnas x 3 filas) dibujada a 32x32.
+        void AgregarTileNivel2(int x, int y, int cuadro)
+        {
+            Obstaculo obstaculo = new Obstaculo(x, y, "Nivel2Hoja", 8, 3, cuadro);
+            obstaculo.SetPos(x, y);
+            obstaculo.ZValue = -2;
+            obstaculos.Add(obstaculo);
+            scene.AddItem(obstaculo);
+        }
+
+        // Decoración tomada de una hoja de sprites (una celda).
+        void AgregarDecoracionHoja(string recurso, int columnas, int filas, int cuadro,
+                                   int x, int y, int ancho, int alto, int z)
+        {
+            Decoracion item = new Decoracion(x, y, recurso, columnas, filas, cuadro, ancho, alto);
+            item.ZValue = z;
+            decoraciones.Add(item);
+            scene.AddItem(item);
+        }
+
         // Recursos individuales existentes
         void AgregarDecoracion(string recurso, int x, int y, int ancho, int alto, int z = -5)
         {
@@ -569,7 +589,15 @@ namespace PixelEsGUI
                 for (int f = 0; f < filas; f++)
                 {
                     int y = Suelo + f * Obstaculo.Tamano;
-                    if (nivelActual == 1)
+                    if (nivelActual == 2)
+                    {
+                        // Nivel 2: césped (celdas 0, 1 y 3) y cuatro variantes de tierra (celdas 4-7).
+                        int cuadro = f == 0
+                            ? (c % 11 == 5 ? 3 : (c % 4 == 2 ? 1 : 0))
+                            : 4 + (c * 7 + f * 3) % 4;
+                        AgregarTileNivel2(x, y, cuadro);
+                    }
+                    else if (nivelActual == 1)
                     {
                         AgregarObstaculo(x, y, f == 0 ? 0 : 1, 0);
                     }
@@ -591,7 +619,10 @@ namespace PixelEsGUI
         {
             for (int i = 0; i < cantidad; i++)
             {
-                AgregarObstaculo(x + i * Obstaculo.Tamano, y, 0, 0);
+                if (nivelActual == 2)
+                    AgregarTileNivel2(x + i * Obstaculo.Tamano, y, 0); // bloque de césped nocturno
+                else
+                    AgregarObstaculo(x + i * Obstaculo.Tamano, y, 0, 0);
             }
 
             // Se registra como superficie sólida: el jugador se para encima y no la atraviesa.
@@ -1160,9 +1191,131 @@ namespace PixelEsGUI
             AgregarMonedasArcoSobreTrampa(1400);      // 5 monedas -> total 20
         }
 
+        // Decoración del NIVEL 2: bosque nocturno. Fondo BgNivel2 repetido, suelo con la hoja derivada de TilesNivel2
+        // (Nivel2Hoja: celdas de 64x64, 8 columnas x 3 filas) y pinos/flora/rocas del mismo estilo.
+        void DecorarNivel2()
+        {
+            // Fondo: 385x383 con la línea de hierba a ~y 304 (justo donde empieza el suelo). Solape de 2 px.
+            for (int i = 0; i < 8; i++)
+            {
+                AgregarDecoracion("BgNivel2", i * 383, 0, 385, 383, -20);
+            }
+
+            // Pinos oscuros (Nivel2Pinos: 2 cuadros de 270x430). Se hunden 6 px para tocar el césped.
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 20, Suelo - 132, 87, 138, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 195, Suelo - 140, 92, 146, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 345, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 495, Suelo - 132, 87, 138, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 645, Suelo - 124, 82, 130, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 795, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 1020, Suelo - 140, 92, 146, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 1170, Suelo - 124, 82, 130, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 1320, Suelo - 140, 92, 146, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 1470, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 1645, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 1870, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 2045, Suelo - 116, 77, 122, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 2220, Suelo - 132, 87, 138, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 0, 2445, Suelo - 124, 82, 130, -8);
+            AgregarDecoracionHoja("Nivel2Pinos", 2, 1, 1, 2595, Suelo - 132, 87, 138, -8);
+
+            // Matojos y rocas oscuras de la hoja (cuadros 12-20 y 23 de Nivel2Hoja).
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 14, 1128, Suelo - 48, 52, 52, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 14, 2456, Suelo - 52, 56, 56, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 12, 2508, Suelo - 60, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 16, 2706, Suelo - 52, 56, 56, -1);
+
+            // Las 4 flores de colores (Flor1-Flor4) sobre el suelo.
+            AgregarDecoracion("Flor1", 150, Suelo - 31, 30, 34, -1);
+            AgregarDecoracion("Flor2", 325, Suelo - 27, 34, 30, -1);
+            AgregarDecoracion("Flor3", 545, Suelo - 25, 36, 28, -1);
+            AgregarDecoracion("Flor4", 735, Suelo - 27, 30, 30, -1);
+            AgregarDecoracion("Flor1", 965, Suelo - 31, 30, 34, -1);
+            AgregarDecoracion("Flor2", 1100, Suelo - 27, 34, 30, -1);
+            AgregarDecoracion("Flor3", 1185, Suelo - 25, 36, 28, -1);
+            AgregarDecoracion("Flor1", 1790, Suelo - 31, 30, 34, -1);
+            AgregarDecoracion("Flor2", 1975, Suelo - 27, 34, 30, -1);
+            AgregarDecoracion("Flor3", 2150, Suelo - 25, 36, 28, -1);
+            AgregarDecoracion("Flor4", 2340, Suelo - 27, 30, 30, -1);
+            AgregarDecoracion("Flor1", 2570, Suelo - 31, 30, 34, -1);
+
+            // Flores sobre las plataformas flotantes (superficie en YPlataforma).
+            AgregarDecoracion("Flor1", 612, YPlataforma - 28, 30, 34, -1);
+            AgregarDecoracion("Flor2", 690, YPlataforma - 24, 34, 30, -1);
+            AgregarDecoracion("Flor3", 1008, YPlataforma - 22, 36, 28, -1);
+            AgregarDecoracion("Flor4", 1058, YPlataforma - 24, 30, 30, -1);
+            AgregarDecoracion("Flor1", 1658, YPlataforma - 28, 30, 34, -1);
+            AgregarDecoracion("Flor2", 1704, YPlataforma - 24, 34, 30, -1);
+            AgregarDecoracion("Flor3", 1892, YPlataforma - 22, 36, 28, -1);
+            AgregarDecoracion("Flor4", 1974, YPlataforma - 24, 30, 30, -1);
+            AgregarDecoracion("Flor1", 2208, YPlataforma - 28, 30, 34, -1);
+            AgregarDecoracion("Flor2", 2254, YPlataforma - 24, 34, 30, -1);
+
+            // Rocas 2 y 3 repartidas por el nivel (Roca2 52x44, Roca3 56x41).
+            AgregarDecoracion("Roca2", 85, Suelo - 41, 52, 44, -3);
+            AgregarDecoracion("Roca3", 660, Suelo - 38, 56, 41, -3);
+            AgregarDecoracion("Roca3", 1028, Suelo - 38, 56, 41, -3);
+            AgregarDecoracion("Roca2", 1700, Suelo - 41, 52, 44, -3);
+            AgregarDecoracion("Roca3", 1880, Suelo - 38, 56, 41, -3);
+            AgregarDecoracion("Roca2", 2250, Suelo - 41, 52, 44, -3);
+            AgregarDecoracion("Roca3", 2400, Suelo - 38, 56, 41, -3);
+
+            // Enredaderas colgando sobre la tierra (dos cuadros apilados: 21 arriba y 22 abajo).
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 60, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 60, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 225, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 225, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 415, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 415, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 555, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 555, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 695, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 695, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 885, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 885, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1050, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1050, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1215, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1215, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1405, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1405, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1545, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1545, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1685, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1685, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 1850, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 1850, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 2015, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 2015, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 2180, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 2180, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 2320, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 2320, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 2510, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 2510, Suelo + 90, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 21, 2700, Suelo + 26, 64, 64, -1);
+            AgregarDecoracionHoja("Nivel2Hoja", 8, 3, 22, 2700, Suelo + 90, 64, 64, -1);
+        }
+
+        // Obstáculos sólidos del nivel 2: uno de cada tipo, en tramos libres (lejos de trampas y de las
+        // zonas de patrulla de guardianes/cazadores).
+        void CrearObstaculosNivel2()
+        {
+            AgregarGrupoCajas(215);                   // 3 cajas: dos en el suelo y una encima (x 215-279)
+
+            AgregarObstaculoSprite("Tronco", 795, Suelo - 50, 140, 76,
+                new Rectangle(809, Suelo - 30, 112, 30));          // tronco caído entre guardián y cazador
+
+            AgregarObstaculoSprite("TroncoPartido", 1530, Suelo - 50, 96, 72,
+                new Rectangle(1538, Suelo - 48, 80, 48));          // tocón tras el punto de control
+        }
+
         // NIVEL 2 (2760 px) - objetivo: llave + evitar al cazador y al guardián (sin monedas).
         void CrearNivel2()
         {
+            DecorarNivel2();
+            CrearObstaculosNivel2();
+
             AgregarTrampa(380);                       // trampa 1: bienvenida
 
             AgregarGuardian(620);                     // guardián 1 bajo plataforma (x 604-732)

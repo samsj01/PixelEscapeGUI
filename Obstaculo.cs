@@ -17,5 +17,13 @@ namespace PixelEsGUI
             int cuadro = fila * ColumnasHoja + columna;
             EstablecerRangoFrames(cuadro, cuadro, false);
         }
+
+        // Tile de otra hoja (nivel 2): celdas uniformes de columnas x filas, dibujadas a 32x32.
+        public Obstaculo(int x, int y, string recurso, int columnas, int filas, int cuadro)
+            : base(x, y, recurso, columnas, filas, 1f)
+        {
+            FijarTamano(Tamano, Tamano);
+            EstablecerRangoFrames(cuadro, cuadro, false);
+        }
     }
 }
