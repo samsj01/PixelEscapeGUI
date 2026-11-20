@@ -14,7 +14,9 @@ namespace PixelEsGUI
 
         // Objetos del escenario.
         readonly List<Coleccionables> coleccionables = new List<Coleccionables>();
-        readonly List<Obstaculo> obstaculos = new List<Obstaculo>(); // bloques de terreno del nivel actual
+        readonly List<Obstaculo> obstaculos = new List<Obstaculo>(); // tiles de terreno
+        readonly List<Decoracion> decoraciones = new List<Decoracion>();
+        readonly List<ObstaculoSprite> obstaculosSprite = new List<ObstaculoSprite>();
         Puerta puerta;
         PuntoControl puntoControl;
 
@@ -384,30 +386,162 @@ namespace PixelEsGUI
             scene.AddItem(obstaculo);
         }
 
+        // Recursos individuales existentes
+        void AgregarDecoracion(string recurso, int x, int y, int ancho, int alto, int z = -5)
+        {
+            Decoracion item = new Decoracion(x, y, recurso, ancho, alto);
+            item.ZValue = z;
+            decoraciones.Add(item);
+            scene.AddItem(item);
+        }
+
+        // Obstáculos con imagen individual y colisión sólida. Pueden bloquear lateralmente
+        // y también servir como superficie si el jugador salta encima.
+        void AgregarObstaculoSprite(string recurso, int x, int y, int ancho, int alto, Rectangle colision)
+        {
+            ObstaculoSprite item = new ObstaculoSprite(x, y, recurso, ancho, alto, colision);
+            item.ZValue = -1;
+            obstaculosSprite.Add(item);
+            jugador.Plataformas.Add(colision);
+            scene.AddItem(item);
+        }
+
+        void DecorarNivel1()
+        {
+            // Fondo panorámico: solapa 2 px entre copias para evitar líneas claras por redondeo.
+            AgregarDecoracion("FondoMontañas", 0, 0, 922, 490, -20);
+            AgregarDecoracion("FondoMontañas", 918, 0, 922, 490, -20);
+
+            // Nubes en una capa distante
+            // Se ubican en la franja alta
+            AgregarDecoracion("Nube1", 110, 6, 106, 32, -18);
+            AgregarDecoracion("Nube2", 490, 14, 90, 32, -18);
+            AgregarDecoracion("Nube2", 790, 20, 90, 32, -18);
+            AgregarDecoracion("Nube1", 1110, 10, 106, 32, -18);
+            AgregarDecoracion("Nube2", 1580, 2, 90, 32, -18);
+
+            // Pinos (Pino1 130x190, Pino2 120x191). El PNG deja ~5 px transparentes abajo,
+            // por eso se bajan 6 px para que la base toque el césped.
+            AgregarDecoracion("Pino1", 34, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 215, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino1", 390, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 520, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino1", 700, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 850, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino1", 1012, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 1215, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino1", 1380, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 1520, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino1", 1618, Suelo - 120, 105, 130, -8);
+            AgregarDecoracion("Pino2", 1730, Suelo - 120, 105, 130, -8);
+
+            // Enredadera (recurso "Enredadera1" = EnredaderasSprite6.png) sobre los tiles de tierra,
+            // colgando desde el borde del césped. Z = -1: por delante de los tiles (-2).
+            AgregarDecoracion("Enredadera1", 50, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 200, Suelo + 10, 26, 112, -1);
+            AgregarDecoracion("Enredadera1", 350, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 500, Suelo + 10, 26, 112, -1);
+            AgregarDecoracion("Enredadera1", 650, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 800, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 950, Suelo + 10, 26, 112, -1);
+            AgregarDecoracion("Enredadera1", 1050, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 1200, Suelo + 10, 26, 112, -1);
+            AgregarDecoracion("Enredadera1", 1350, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 1500, Suelo + 10, 26, 126, -1);
+            AgregarDecoracion("Enredadera1", 1650, Suelo + 10, 26, 112, -1);
+            AgregarDecoracion("Enredadera1", 1800, Suelo + 10, 26, 126, -1);
+
+            // Arbustos variados de la colección nueva, todos apoyados en la superficie.
+            AgregarDecoracion("Arbusto1", 140, Suelo - 39, 54, 41, -1);
+            AgregarDecoracion("Arbusto2", 310, Suelo - 43, 76, 52, -1);
+            AgregarDecoracion("Arbusto4", 630, Suelo - 39, 76, 48, -1);
+            AgregarDecoracion("Arbusto 3", 940, Suelo - 39, 54, 41, -1);
+            AgregarDecoracion("Arbusto1", 1180, Suelo - 39, 54, 41, -1);
+            AgregarDecoracion("Arbusto2", 1345, Suelo - 43, 76, 52, -1);
+            AgregarDecoracion("Arbusto4", 1495, Suelo - 39, 76, 48, -1);
+            // Rocas de tamaños alternos y flores pequeñas para dar detalle sin bloquear saltos.
+            AgregarDecoracion("Roca2", 15, Suelo - 27, 48, 28, -3);
+            AgregarDecoracion("Roca1", 103, Suelo - 25, 55, 30, -3);
+            AgregarDecoracion("Roca3", 276, Suelo - 25, 45, 30, -3);
+            AgregarDecoracion("Roca3", 840, Suelo - 25, 45, 30, -3);
+            AgregarDecoracion("Roca1", 492, Suelo - 25, 55, 30, -3);
+            AgregarDecoracion("Roca2", 1000, Suelo - 27, 48, 28, -3);
+            AgregarDecoracion("Roca3", 1132, Suelo - 25, 42, 26, -3);
+            AgregarDecoracion("Roca1", 1617, Suelo - 25, 55, 30, -3);
+            AgregarDecoracion("Roca1", 1800, Suelo - 25, 55, 30, -3);
+
+            AgregarDecoracion("Flor1", 195, Suelo - 22, 30, 32, -1);
+            AgregarDecoracion("Flor2", 383, Suelo - 22, 30, 32, -1);
+            AgregarDecoracion("Flor3", 815, Suelo - 22, 30, 32, -1);
+            AgregarDecoracion("Flor4", 995, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor1", 1115, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor3", 1165, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor2", 1640, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor4", 1790, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor2", 1775, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor2", 1750, Suelo - 22, 20, 22, -1);
+            AgregarDecoracion("Flor3", 204, Suelo - 22, 30, 32, -1);
+            AgregarDecoracion("Flor1", 820, Suelo - 107, 30, 32, -1);
+            AgregarDecoracion("Flor2", 948, Suelo - 107, 30, 32, -1);
+        }
+
+        void CrearObstaculosNivel1()
+        {
+            // Cajas (32x32) en grupo: dos en el suelo, una al lado de la otra, y una tercera
+            // encima de la segunda. Cada una con su propia colisión.
+            AgregarGrupoCajas(430);
+
+            // El PNG del tronco tiene márgenes transparentes; el dibujo se alinea por su alpha
+            // inferior y la colisión cubre únicamente la zona sólida visible.
+            AgregarObstaculoSprite("Tronco", 690, Suelo - 50, 140, 76,
+                new Rectangle(704, Suelo - 30, 112, 30));
+
+            // El PNG deja margen transparente abajo: se baja 4 px para que apoye en el césped.
+            AgregarObstaculoSprite("TroncoPartido", 1280, Suelo - 50, 96, 72,
+                new Rectangle(1288, Suelo - 48, 80, 48));
+
+            AgregarGrupoCajas(1550);
+        }
+
+        // Dos cajas en el suelo (x, x + 32) y una encima de la segunda (x + 32).
+        void AgregarGrupoCajas(int x)
+        {
+            AgregarObstaculoSprite("Caja", x, Suelo - 32, 32, 32,
+                new Rectangle(x, Suelo - 32, 32, 32));
+            AgregarObstaculoSprite("Caja", x + 32, Suelo - 32, 32, 32,
+                new Rectangle(x + 32, Suelo - 32, 32, 32));
+            AgregarObstaculoSprite("Caja", x + 32, Suelo - 64, 32, 32,
+                new Rectangle(x + 32, Suelo - 64, 32, 32));
+        }
+
         // Suelo completo: una fila de césped en Y = Suelo y tierra hacia abajo hasta el borde de la ventana.
         void CrearSuelo()
         {
-            int[] columnasCesped = { 1, 3, 5 };                                   // 3 variantes de césped (fila 1)
-            int[,] tierra = { { 3, 1 }, { 3, 5 }, { 5, 1 }, { 5, 3 }, { 5, 5 } }; // 5 variantes de tierra
-
+            // En el nivel 1 se utiliza una sola textura de superficie y una de tierra:
+            // esto elimina cambios de diseño y hace que los bloques se vean uniformes.
+            // Los niveles 2 y 3 conservan su variedad original de texturas.
+            int[] columnasCesped = { 0, 2, 4, 5 };
+            int[,] tierra = { { 1, 1 }, { 1, 2 }, { 1, 3 }, { 1, 4 } };
             int columnas = AnchoNivel / Obstaculo.Tamano + 1;
             int filas = (ClientSize.Height - Suelo) / Obstaculo.Tamano + 1;
-
             for (int c = 0; c < columnas; c++)
             {
+                int x = c * Obstaculo.Tamano;
                 for (int f = 0; f < filas; f++)
                 {
-                    int x = c * Obstaculo.Tamano;
                     int y = Suelo + f * Obstaculo.Tamano;
-
-                    if (f == 0)
+                    if (nivelActual == 1)
                     {
-                        AgregarObstaculo(x, y, 1, columnasCesped[c % 3]);
+                        AgregarObstaculo(x, y, f == 0 ? 0 : 1, 0);
+                    }
+                    else if (f == 0)
+                    {
+                        AgregarObstaculo(x, y, 0, columnasCesped[c % columnasCesped.Length]);
                     }
                     else
                     {
-                        int t = (c * 7 + f * 3) % 5; // reparto "aleatorio" pero fijo
-                        AgregarObstaculo  (x, y, tierra[t, 0], tierra[t, 1]);
+                        int t = (c * 7 + f * 3) % tierra.GetLength(0);
+                        AgregarObstaculo(x, y, tierra[t, 0], tierra[t, 1]);
                     }
                 }
             }
@@ -418,7 +552,7 @@ namespace PixelEsGUI
         {
             for (int i = 0; i < cantidad; i++)
             {
-                AgregarObstaculo(x + i * Obstaculo.Tamano, y, 1, 7);
+                AgregarObstaculo(x + i * Obstaculo.Tamano, y, 0, 0);
             }
 
             // Se registra como superficie sólida: el jugador se para encima y no la atraviesa.
@@ -485,7 +619,7 @@ namespace PixelEsGUI
         void AgregarTrampa(int x)
         {
             Trampa t = new Trampa(x, 0, 1);
-            t.SetPos(x, Suelo - (int)t.Alto);
+            t.SetPos(x, Suelo - 65);
             t.ZValue = -1;
             trampas.Add(t);
             scene.AddItem(t);
@@ -790,6 +924,18 @@ namespace PixelEsGUI
                 scene.RemoveItem(obstaculo);
             }
             obstaculos.Clear();
+            foreach (Decoracion item in decoraciones)
+            {
+                item.Visible = false;
+                scene.RemoveItem(item);
+            }
+            decoraciones.Clear();
+            foreach (ObstaculoSprite item in obstaculosSprite)
+            {
+                item.Visible = false;
+                scene.RemoveItem(item);
+            }
+            obstaculosSprite.Clear();
             jugador.Plataformas.Clear();
 
             foreach (GuardianPixel g in guardianes)
@@ -845,14 +991,14 @@ namespace PixelEsGUI
             // Puerta cerca del final del nivel
             int xPuerta = AnchoNivel - 140;
             puerta = new Puerta(xPuerta, 0);
-            puerta.SetPos(xPuerta, Suelo - (int)puerta.Alto);
+            puerta.SetPos(xPuerta, Suelo - (int)puerta.Alto + 11); // +11: el cuadro deja margen transparente abajo
             puerta.ZValue = -1;
             scene.AddItem(puerta);
 
             // Punto de control a mitad del nivel
             int xControl = xPuntoControl[nivelActual - 1];
             puntoControl = new PuntoControl(xControl, 0);
-            puntoControl.SetPos(xControl, Suelo - (int)puntoControl.Alto);
+            puntoControl.SetPos(xControl, Suelo - (int)puntoControl.Alto + 13); // +13: apoya en el césped
             puntoControl.ZValue = -1;
             scene.AddItem(puntoControl);
 
@@ -948,6 +1094,9 @@ namespace PixelEsGUI
         // NIVEL 1 (1840 px) - objetivo: 20 monedas. Sin enemigos ni llave: es el nivel de aprendizaje.
         void CrearNivel1()
         {
+            DecorarNivel1();
+            CrearObstaculosNivel1();
+
             AgregarMonedasLinea(230, 4);              // 4 monedas: calentamiento (x 230-405)
 
             AgregarTrampa(540);                       // trampa 1 (x 540-604)

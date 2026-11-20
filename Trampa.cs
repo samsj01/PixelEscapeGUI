@@ -1,52 +1,32 @@
 namespace PixelEsGUI
 {
-    // Clase concreta (no abstracta): se pueden crear trampas con new Trampa(...).
-    // Causa daño al jugador (una vez por pasada) cuando pisa su zona; saltándola no hace daño.
+    // Pinchos estáticos: recurso individual "Pinchos". Daña una vez al entrar en su zona
+    // cuando el jugador está apoyado en el suelo; saltarlos no activa el daño.
     internal class Trampa : ObjetoActivable
     {
-        // ---------- Hoja de sprites (Resources/2.png, recurso "Trampa") ----------
-        // 192x32: una sola fila de 6 cuadros de 32x32. Las púas salen y se esconden:
-        //   cuadro 0: en reposo (apenas asoman)  ->  cuadros 1 a 3: salen  ->  cuadros 4 y 5: se esconden
-        const int ColumnasHoja = 6;
-        const int FilasHoja = 1;
-        const int CuadroReposo = 0;
-        const int UltimoCuadro = ColumnasHoja - 1;
-        const float Fps = 12f;
-        const float TamanoPantalla = 48f; // 2x el tamaño original (32x32)
-
-        bool jugadorEncima; // true mientras el jugador sigue dentro de la zona de la trampa
-
+        const float TamanoSprite = 100f;
+        bool jugadorEncima;
         public int Dano { get; }
 
-        public Trampa(int x, int y, int dano) : base(x, y, "Trampa", ColumnasHoja, FilasHoja, Fps)
+        public Trampa(int x, int y, int dano)
+            : base(x, y, "Pinchos", 1, 1, 1f)
         {
             Dano = dano;
-            FijarTamano(TamanoPantalla, TamanoPantalla);
-            EstablecerRangoFrames(CuadroReposo, UltimoCuadro, true);
+            FijarTamano(TamanoSprite, TamanoSprite);
+            EstablecerRangoFrames(0, 0, false);
         }
 
         public override bool Activar(Jugador jugador)
         {
-            // El jugador "pisa" la trampa si su centro queda dentro del ancho de la trampa
-            // y está en el suelo (si salta por encima, no la activa).
+            // El PNG tiene margen transparente. La zona activa se aproxima al ancho visible.
             float centroJugador = jugador.X + jugador.Ancho / 2f;
-            bool pisando = jugador.EnElSuelo && centroJugador >= X && centroJugador <= X + Ancho;
-
-            // El daño y las púas se disparan solo al ENTRAR en la zona, no en cada fotograma.
+            bool pisando = jugador.EnElSuelo && centroJugador >= X + 7 && centroJugador <= X + 93;
             if (pisando && !jugadorEncima)
-            {
                 jugador.RecibirDano(Dano);
-                // La animación ya está en bucle desde que se crea la trampa.
-            }
+
             jugadorEncima = pisando;
             Activo = pisando;
             return Activo;
-        }
-
-        // Al terminar la animación, la trampa vuelve al cuadro de reposo.
-        public override void Update(float deltaTime)
-        {
-            base.Update(deltaTime);
         }
     }
 }
