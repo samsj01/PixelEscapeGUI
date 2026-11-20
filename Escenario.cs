@@ -39,6 +39,8 @@ namespace PixelEsGUI
         // Interfaz superpuesta: vidas y paneles de pausa/fin de partida.
         readonly Label lblVidas = new Label();
         readonly Label lblPowerUps = new Label();
+        readonly Label lblMonedas = new Label(); // contador de monedas, debajo de las vidas
+        string textoMonedas = "";
         readonly Panel panelEstado = new Panel();
         readonly Label lblTituloEstado = new Label();
         readonly Label lblMensajeEstado = new Label();
@@ -183,6 +185,16 @@ namespace PixelEsGUI
             lblVidas.Text = "♥ ♥ ♥";
             Visor.Controls.Add(lblVidas);
 
+            // Contador de monedas: justo debajo de los corazones.
+            lblMonedas.AutoSize = true;
+            lblMonedas.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+            lblMonedas.ForeColor = Color.Gold;
+            lblMonedas.BackColor = Color.Transparent; // igual que las vidas
+            lblMonedas.Padding = new Padding(2);
+            lblMonedas.Location = new Point(12, 48);
+            lblMonedas.Text = "Coins: 0 / 20";
+            Visor.Controls.Add(lblMonedas);
+
             lblPowerUps.AutoSize = false;
             lblPowerUps.Size = new Size(260, 58);
             lblPowerUps.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -190,7 +202,7 @@ namespace PixelEsGUI
             lblPowerUps.BackColor = Color.FromArgb(150, 25, 35, 45);
             lblPowerUps.Padding = new Padding(8, 5, 8, 5);
             lblPowerUps.TextAlign = ContentAlignment.MiddleLeft;
-            lblPowerUps.Location = new Point(14, 58);
+            lblPowerUps.Location = new Point(14, 92); // debajo del contador de monedas
             lblPowerUps.Visible = false;
             Visor.Controls.Add(lblPowerUps);
 
@@ -236,7 +248,25 @@ namespace PixelEsGUI
             Controls.Add(panelEstado);
             panelEstado.BringToFront();
             lblVidas.BringToFront();
+            lblMonedas.BringToFront();
             lblPowerUps.BringToFront();
+        }
+
+        // Monedas que exige cada nivel (el nivel 2 no tiene monedas: se oculta el contador).
+        int MetaMonedas => nivelActual == 2 ? 0 : 20;
+
+        void ActualizarContadorMonedas()
+        {
+            if (lblMonedas.IsDisposed) return;
+            int meta = MetaMonedas;
+            lblMonedas.Visible = meta > 0;
+            string texto = "Coins: " + monedasRecogidas + " / " + meta;
+            if (texto != textoMonedas)
+            {
+                textoMonedas = texto;
+                lblMonedas.Text = texto;
+            }
+            lblMonedas.ForeColor = monedasRecogidas >= meta ? Color.LimeGreen : Color.Gold;
         }
 
         void ActualizarIndicadorVidas()
@@ -313,6 +343,7 @@ namespace PixelEsGUI
             panelEstado.Visible = true;
             panelEstado.BringToFront();
             lblVidas.BringToFront();
+            lblMonedas.BringToFront();
             lblPowerUps.BringToFront();
         }
 
@@ -501,6 +532,14 @@ namespace PixelEsGUI
                 new Rectangle(1288, Suelo - 48, 80, 48));
 
             AgregarGrupoCajas(1550);
+
+            // Obstáculos adicionales
+            AgregarObstaculoSprite("Caja", 160, Suelo - 32, 32, 32,
+                new Rectangle(160, Suelo - 32, 32, 32));
+            AgregarObstaculoSprite("Tronco", 1110, Suelo - 50, 140, 76,
+                new Rectangle(1110, Suelo - 30, 112, 30));
+            AgregarObstaculoSprite("Caja", 875, Suelo - 115, 32, 32,
+                new Rectangle(875, Suelo - 115, 32, 32));
         }
 
         // Dos cajas en el suelo (x, x + 32) y una encima de la segunda (x + 32).
@@ -769,6 +808,7 @@ namespace PixelEsGUI
                     }
                 }
             }
+            ActualizarContadorMonedas();
 
             // El contacto con cualquier enemigo descuenta una vida.
             Rectangle cuerpoJugador = CuerpoJugador();
@@ -1006,6 +1046,8 @@ namespace PixelEsGUI
             {
                 puntoControl.Activar(jugador); // la bandera ya aparece levantada
             }
+
+            ActualizarContadorMonedas();
         }
 
         // Guarda dónde reaparecer (en la bandera) y qué monedas/llave llevaba el jugador.
@@ -1042,6 +1084,7 @@ namespace PixelEsGUI
                 }
             }
             jugador.EstablecerPuntaje(puntajeCheckpoint);
+            ActualizarContadorMonedas();
         }
 
         // Derrota (tocar un enemigo o quedarse sin vidas): el nivel se reinicia por completo
@@ -1098,12 +1141,16 @@ namespace PixelEsGUI
             CrearObstaculosNivel1();
 
             AgregarMonedasLinea(230, 4);              // 4 monedas: calentamiento (x 230-405)
+            AgregarTrampa(260);                       // trampa extra: se salta al recoger las monedas
 
             AgregarTrampa(540);                       // trampa 1 (x 540-604)
             AgregarMonedasArcoSobreTrampa(540);       // 5 monedas: se recogen saltando la trampa
 
             CrearPlataforma(800, YPlataforma, 6);     // plataforma (x 800-992)
-            AgregarMonedasPlataforma(830, 3, 50);     // 3 monedas encima
+            // 3 monedas encima; la central sube para que la caja de la plataforma no la tape.
+            AgregarMonedaEn(830, YMonedaPlataforma);
+            AgregarMonedaEn(880, YMonedaPlataforma - 44);
+            AgregarMonedaEn(930, YMonedaPlataforma);
 
             // Punto de control en x = 1060
 
