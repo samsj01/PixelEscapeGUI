@@ -118,9 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="background" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\back.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="CazadorPixel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cazador_sheet.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -148,9 +145,6 @@
   <data name="Caja" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\sprite_019.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Arbol" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\sprite_023.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Tronco" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Gemini_Generated_Image_bv53vvbv53vvbv53-removebg-preview (1).png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -165,12 +159,6 @@
   </data>
   <data name="BosqueTiles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\TilesNonSliced.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Arbol2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ArbolesSprite6.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Arbol3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ArbolesSprite3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Arbusto1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Arbusto1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -198,12 +186,6 @@
   </data>
   <data name="Enredadera1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\EnredaderasSprite6.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Enredadera2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\EnredaderasSprite4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Enredadera3" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\EnredaderasSprite1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Nube1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\NubesSprite1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -237,5 +219,23 @@
   </data>
   <data name="Nivel2Pinos" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Nivel2Pinos.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Nivel3Fondo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Nivel3Fondo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Nivel3Hoja" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Nivel3Hoja.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Nivel3Vasija" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Nivel3Vasija.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Nivel3Columna" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Nivel3Columna.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ArbustoNivel2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ArbustoNivel2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Arbusto2Nivel2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Arbusto2Nivel2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

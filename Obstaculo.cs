@@ -25,5 +25,12 @@ namespace PixelEsGUI
             FijarTamano(Tamano, Tamano);
             EstablecerRangoFrames(cuadro, cuadro, false);
         }
+
+        // Dibuja el tile 'px' píxeles más grande (hacia derecha y abajo) para que dos tiles vecinos
+        // se solapen y no quede una línea fina por donde se vea el fondo. No cambia la colisión.
+        public void AgrandarBorde(int px)
+        {
+            FijarTamano(Tamano + px, Tamano + px);
+        }
     }
 }

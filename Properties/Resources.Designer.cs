@@ -63,36 +63,6 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Arbol {
-            get {
-                object obj = ResourceManager.GetObject("Arbol", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Arbol2 {
-            get {
-                object obj = ResourceManager.GetObject("Arbol2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Arbol3 {
-            get {
-                object obj = ResourceManager.GetObject("Arbol3", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Arbusto_3 {
             get {
                 object obj = ResourceManager.GetObject("Arbusto 3", resourceCulture);
@@ -123,6 +93,16 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Arbusto2Nivel2 {
+            get {
+                object obj = ResourceManager.GetObject("Arbusto2Nivel2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Arbusto4 {
             get {
                 object obj = ResourceManager.GetObject("Arbusto4", resourceCulture);
@@ -133,9 +113,9 @@ namespace PixelEsGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background {
+        internal static System.Drawing.Bitmap ArbustoNivel2 {
             get {
-                object obj = ResourceManager.GetObject("background", resourceCulture);
+                object obj = ResourceManager.GetObject("ArbustoNivel2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -186,26 +166,6 @@ namespace PixelEsGUI.Properties {
         internal static System.Drawing.Bitmap Enredadera1 {
             get {
                 object obj = ResourceManager.GetObject("Enredadera1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Enredadera2 {
-            get {
-                object obj = ResourceManager.GetObject("Enredadera2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Enredadera3 {
-            get {
-                object obj = ResourceManager.GetObject("Enredadera3", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -316,6 +276,46 @@ namespace PixelEsGUI.Properties {
         internal static System.Drawing.Bitmap Nivel2Pinos {
             get {
                 object obj = ResourceManager.GetObject("Nivel2Pinos", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Nivel3Columna {
+            get {
+                object obj = ResourceManager.GetObject("Nivel3Columna", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Nivel3Fondo {
+            get {
+                object obj = ResourceManager.GetObject("Nivel3Fondo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Nivel3Hoja {
+            get {
+                object obj = ResourceManager.GetObject("Nivel3Hoja", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Nivel3Vasija {
+            get {
+                object obj = ResourceManager.GetObject("Nivel3Vasija", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
