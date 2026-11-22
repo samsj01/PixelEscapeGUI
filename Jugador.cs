@@ -44,6 +44,9 @@ namespace PixelEsGUI
         double sueloY;             // altura (Y) de la que parte la parábola actual
         int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
         double posicionVertical; // conserva fracciones de píxel entre actualizaciones
+        double posicionHorizontalAire;
+        const double MultiplicadorVelocidadAire = 1.6;
+        const double FpsReferenciaMovimiento = 60.0;
 
         // ---------- Propiedades ----------
         public int Puntaje { get; private set; }
@@ -194,6 +197,7 @@ namespace PixelEsGUI
 
             velx = 0;
             posicionVertical = y;
+            posicionHorizontalAire = x;
             movimientoHorizontal = 0;
 
             // Reiniciar posición
@@ -238,6 +242,27 @@ namespace PixelEsGUI
             return seMovio;
         }
 
+        // Movimiento horizontal adicional solo en el aire, medido en píxeles/segundo.
+        // No modifica la velocidad al caminar sobre el suelo.
+        public void MoverHorizontalEnAire(int direccion, double deltaTime)
+        {
+            if (EnElSuelo || direccion == 0)
+                return;
+
+            movimientoHorizontal = 3;
+            Direccion = direccion < 0 ? -1 : 1;
+            double paso = Velocidad * FpsReferenciaMovimiento
+                * MultiplicadorVelocidadAire * Math.Max(0, Math.Min(deltaTime, 0.05));
+            double anterior = posicionHorizontalAire;
+            posicionHorizontalAire += Direccion * paso;
+            SetPos((int)Math.Round(posicionHorizontalAire), Y);
+            if (ChocaConPlataforma())
+            {
+                posicionHorizontalAire = anterior;
+                SetPos((int)Math.Round(anterior), Y);
+            }
+        }
+
         // ---------- Salto ----------
         // Orden esperado en cada fotograma: MoverIzq/MoverDer -> Saltar -> Aterrizar.
         // - Si en este fotograma se movió a un lado: salto parabólico (60°).
@@ -250,6 +275,7 @@ namespace PixelEsGUI
             }
 
             VelY = ImpulsoSalto;
+            posicionHorizontalAire = X;
             posicionVertical = Y;
             EnElSuelo = false;
         }
@@ -302,6 +328,7 @@ namespace PixelEsGUI
                             SetPos(X, superficie - PiesOffset);
                             posicionVertical = Y;
                             EnElSuelo = true;
+                            posicionHorizontalAire = X;
                             SaltoParabolico = false;
                             velx = 0;
                             VelY = 0;
