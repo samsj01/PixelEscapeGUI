@@ -1,4 +1,5 @@
 ﻿using Engine2D;
+using System.Diagnostics;
 
 namespace PixelEsGUI
 {
@@ -31,6 +32,7 @@ namespace PixelEsGUI
         bool izquierda, derecha, salto;
         bool pausado = false;
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
+        readonly Stopwatch relojSalto = new Stopwatch();
         readonly System.Windows.Forms.Timer timerRespawn = new System.Windows.Forms.Timer { Interval = 520 };
         bool respawnPendiente = false;
 
@@ -142,7 +144,9 @@ namespace PixelEsGUI
             //mover -> saltar -> aterrizar (ver Jugador.Saltar).
             bucleJuego.Tick += (s, e) =>
             {
-                PasoDeJuego();
+                double deltaTime = relojSalto.IsRunning ? relojSalto.Elapsed.TotalSeconds : 1.0 / 60.0;
+                relojSalto.Restart();
+                PasoDeJuego(deltaTime);
                 ActualizarAvisosPowerUp();
             };
             timerAvisoPowerUp.Tick += (s, e) =>
@@ -347,6 +351,7 @@ namespace PixelEsGUI
             juegoTerminado = true;
             pausado = false;
             bucleJuego.Stop();
+            relojSalto.Reset();
             MostrarPanelEstado("¡VICTORIA!", "¡Felicitaciones! Completaste los tres niveles de Pixel Escape.", "Jugar nuevamente");
         }
 
@@ -383,11 +388,13 @@ namespace PixelEsGUI
             if (pausado)
             {
                 bucleJuego.Stop();
+                relojSalto.Reset();
                 MostrarPanelEstado("JUEGO EN PAUSA", "Pulsa P o el botón para continuar.", "Reanudar");
             }
             else
             {
                 panelEstado.Visible = false;
+                relojSalto.Restart();
                 bucleJuego.Start();
             }
         }
@@ -396,7 +403,8 @@ namespace PixelEsGUI
         {
             pausado = false;
             panelEstado.Visible = false;
-            bucleJuego.Start();
+            relojSalto.Restart();
+                bucleJuego.Start();
             Visor.Focus();
         }
 
@@ -787,7 +795,7 @@ namespace PixelEsGUI
             }
         }
 
-        void PasoDeJuego()
+        void PasoDeJuego(double deltaTime)
         {
             // No continuar mientras se cambia de nivel
             if (transicionEnCurso || juegoTerminado || pausado)
@@ -795,7 +803,7 @@ namespace PixelEsGUI
 
             if (respawnPendiente)
             {
-                jugador.Aterrizar(); // mantiene la animación de daño mientras espera la reaparición
+                jugador.Aterrizar(deltaTime); // mantiene la animación de daño mientras espera la reaparición
                 return;
             }
 
@@ -820,7 +828,7 @@ namespace PixelEsGUI
                 jugador.Saltar();
             }
 
-            jugador.Aterrizar();
+            jugador.Aterrizar(deltaTime);
 
             // La cámara sigue al jugador y este no se sale de los bordes del nivel
             LimitarJugadorAlNivel();
@@ -1131,6 +1139,7 @@ namespace PixelEsGUI
             {
                 // Se conserva visible la reacción de daño antes de reaparecer.
                 respawnPendiente = true;
+                relojSalto.Restart();
                 bucleJuego.Start();
                 timerRespawn.Stop();
                 timerRespawn.Start();
@@ -1623,7 +1632,8 @@ namespace PixelEsGUI
                         derecha = false;
                         salto = false;
 
-                        bucleJuego.Start();
+                        relojSalto.Restart();
+                bucleJuego.Start();
                     }
                 }
             }
