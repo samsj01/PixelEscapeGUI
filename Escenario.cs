@@ -1,4 +1,4 @@
-﻿﻿using Engine2D;
+﻿using Engine2D;
 
 namespace PixelEsGUI
 {
@@ -67,6 +67,7 @@ namespace PixelEsGUI
             Visor.Dock = DockStyle.Fill;
 
             ConfigurarInterfaz();
+            ConfigurarPantallas(); // pantallas de inicio, controles y cambio de nivel (EscenarioPantallas.cs)
 
             jugador = new Jugador(100, Suelo - 88);
             scene.AddItem(jugador);
@@ -87,8 +88,7 @@ namespace PixelEsGUI
                 else
                 {
                     CargarNivel(nivelActual + 1);
-
-
+                    MostrarPantallaNivel(nivelActual); // pantalla "NIVEL 2" / "NIVEL 3"
                 }
             };
 
@@ -121,6 +121,8 @@ namespace PixelEsGUI
             KeyPreview = true;
             KeyDown += (s, e) =>
             {
+                if (pantallaActiva) return; // con una pantalla visible no se mueve, pausa ni reinicia
+
                 if (e.KeyCode == Keys.P)
                 {
                     AlternarPausa();
@@ -163,7 +165,7 @@ namespace PixelEsGUI
             this.Shown += (s, e) =>
             {
                 Visor.Start();
-                bucleJuego.Start();
+                MostrarPantallaInicio(); // el juego empieza al pulsar EMPEZAR (el bucle arranca al cerrar las pantallas)
             };
         }
 
@@ -370,8 +372,7 @@ namespace PixelEsGUI
             nivelActual = 1;
             CargarNivel(1, false);
             ActualizarIndicadorVidas();
-            bucleJuego.Start();
-            Visor.Focus();
+            MostrarPantallaNivel(1); // vuelve a mostrar "NIVEL 1"; el bucle arranca al pulsar COMENZAR
         }
 
         void AlternarPausa()
