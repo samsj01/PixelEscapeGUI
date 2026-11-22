@@ -45,6 +45,8 @@ namespace PixelEsGUI
         int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
         double posicionVertical; // conserva fracciones de píxel entre actualizaciones
         double posicionHorizontalAire;
+        const double VelocidadHorizontalSuelo = 225.0;
+        const int SolapeMinimoApoyo = 8;
         // Velocidad aérea fija: no se duplica con el power-up de velocidad.
         // 225 px/s * 0.65 s = ~146 px de alcance en terreno plano.
         const double VelocidadHorizontalAire = 225.0;
@@ -75,6 +77,8 @@ namespace PixelEsGUI
             Vida = 3;
             Dano = 1;
             sueloBaseY = y;
+            posicionVertical = y;
+            posicionHorizontalAire = x;
             ActualizarAnimacion(false);
         }
 
@@ -243,25 +247,42 @@ namespace PixelEsGUI
             return seMovio;
         }
 
-        // Movimiento horizontal adicional solo en el aire, medido en píxeles/segundo.
-        // No modifica la velocidad al caminar sobre el suelo.
-        public void MoverHorizontalEnAire(int direccion, double deltaTime)
+        // Caminar y saltar usan la misma velocidad base y el mismo deltaTime.
+        // El power-up duplica solo la velocidad al caminar.
+        public void MoverHorizontal(int direccion, double deltaTime)
         {
-            if (EnElSuelo || direccion == 0)
-                return;
+            if (direccion == 0) return;
 
             movimientoHorizontal = 3;
             Direccion = direccion < 0 ? -1 : 1;
-            double paso = VelocidadHorizontalAire * Math.Max(0, Math.Min(deltaTime, 0.05));
+            double velocidad = EnElSuelo
+                ? VelocidadHorizontalSuelo * (TieneVelocidad ? 2.0 : 1.0)
+                : VelocidadHorizontalAire;
             double anterior = posicionHorizontalAire;
-            posicionHorizontalAire += Direccion * paso;
+            int xAnterior = X;
+            posicionHorizontalAire += Direccion * velocidad * Math.Max(0, Math.Min(deltaTime, 0.05));
             SetPos((int)Math.Round(posicionHorizontalAire), Y);
-            if (ChocaConPlataforma())
+
+            // Solo bloquear al entrar lateralmente desde fuera del obstáculo.
+            // No devolver al personaje por una intersección que ya existía al caer.
+            Rectangle cuerpoAnterior = new Rectangle(xAnterior + CuerpoX, Y + CuerpoY, CuerpoAncho, CuerpoAlto);
+            Rectangle cuerpoNuevo = Cuerpo;
+            foreach (Rectangle plataforma in Plataformas)
             {
-                posicionHorizontalAire = anterior;
-                SetPos((int)Math.Round(anterior), Y);
+                if (!cuerpoNuevo.IntersectsWith(plataforma)) continue;
+                bool entraDesdeIzquierda = Direccion > 0 && cuerpoAnterior.Right <= plataforma.Left;
+                bool entraDesdeDerecha = Direccion < 0 && cuerpoAnterior.Left >= plataforma.Right;
+                if (entraDesdeIzquierda || entraDesdeDerecha)
+                {
+                    posicionHorizontalAire = anterior;
+                    SetPos(xAnterior, Y);
+                    break;
+                }
             }
         }
+
+        // Se llama cuando otra parte del escenario corrige X (por ejemplo, límites del nivel).
+        public void SincronizarPosicionHorizontal() => posicionHorizontalAire = X;
 
         // ---------- Salto ----------
         // Orden esperado en cada fotograma: MoverIzq/MoverDer -> Saltar -> Aterrizar.
@@ -378,7 +399,8 @@ namespace PixelEsGUI
         {
             int izquierda = X + CuerpoX;
             int derecha = izquierda + CuerpoAncho;
-            return izquierda < plataforma.Right && derecha > plataforma.Left;
+            int solape = Math.Min(derecha, plataforma.Right) - Math.Max(izquierda, plataforma.Left);
+            return solape >= SolapeMinimoApoyo;
         }
 
         bool HaySueloBajoLosPies()
