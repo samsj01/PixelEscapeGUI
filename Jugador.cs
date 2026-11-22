@@ -10,9 +10,13 @@ namespace PixelEsGUI
         // ---------- Constantes del salto ----------
         const double AnguloVertical = Math.PI / 2;   // 90°: salto recto
         const double AnguloParabolico = Math.PI / 3; // 60°: salto con desplazamiento lateral
-        const int Gravedad = 4;
         const int FuerzaSaltoBase = 4;
-        const double Tiempo = 0.25;                  // intervalo de simulación por fotograma
+        const double AlturaSalto = 98.0;
+        const double TiempoSubida = 0.38;
+        const double TiempoCaida = 0.27;
+        const double GravedadSubida = 2 * AlturaSalto / (TiempoSubida * TiempoSubida);
+        const double GravedadCaida = 2 * AlturaSalto / (TiempoCaida * TiempoCaida);
+        const double ImpulsoSalto = GravedadSubida * TiempoSubida;
 
         // ---------- Hoja de sprites (Resources/jugador_sheet.png) ----------
         // 8 cuadros por fila y 6 filas. Solo hay animaciones hacia abajo (izquierda y derecha):
@@ -39,7 +43,7 @@ namespace PixelEsGUI
         int origenX;
         double sueloY;             // altura (Y) de la que parte la parábola actual
         int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
-        double tiempoVuelo;
+        double posicionVertical; // conserva fracciones de píxel entre actualizaciones
 
         // ---------- Propiedades ----------
         public int Puntaje { get; private set; }
@@ -189,7 +193,7 @@ namespace PixelEsGUI
             VelY = 0;
 
             velx = 0;
-            tiempoVuelo = 0;
+            posicionVertical = y;
             movimientoHorizontal = 0;
 
             // Reiniciar posición
@@ -245,80 +249,72 @@ namespace PixelEsGUI
                 return;
             }
 
-            // Calculamos únicamente la velocidad vertical inicial (Impulso en Y)
-            // Se usa AnguloVertical (o directamente la velocidad del salto) para el impulso vertical.
-            double velInicial = VelSalto * FuerzaSalto;
-            VelY = velInicial * Math.Sin(AnguloVertical);
-
-            sueloY = Y;
-            tiempoVuelo = 0;
+            VelY = ImpulsoSalto;
+            posicionVertical = Y;
             EnElSuelo = false;
         }
 
-        // Avanza un fotograma del salto o de la caída. Se llama una vez por fotograma.
-        //   y(t) = sueloY - (v0y * t - 1/2 * gravedad * t^2)   (el eje Y crece hacia abajo)
-        // - Subiendo: si la cabeza llega al borde de abajo de una plataforma, rebota y empieza a caer.
-        // - Bajando: aterriza en lo primero que cruce con los pies (tope de una plataforma o suelo principal).
-        // - Parado en el suelo: si ya no hay nada bajo los pies (se salió del borde), empieza a caer.
-        public void Aterrizar()
+        // Avanza la física vertical usando segundos reales; la velocidad positiva indica subida.
+        // Se parte el paso cuando alcanza la cima para mantener las dos gravedades exactas.
+        public void Aterrizar(double deltaTime)
         {
             ActualizarInvulnerabilidad();
             ActualizarVelocidadTemporal();
 
             if (EnElSuelo && !HaySueloBajoLosPies())
-            {
                 EmpezarCaida();
-            }
 
             if (!EnElSuelo)
             {
-                double velInicialY = VelSalto * FuerzaSalto;
-                int piesAntes = PiesY;
-                int cabezaAntes = Y + CuerpoY;
-
-                tiempoVuelo += Tiempo;
-                double altura = velInicialY * tiempoVuelo - 0.5 * Gravedad * tiempoVuelo * tiempoVuelo;
-                int nuevaY = (int)Math.Round(sueloY - altura);
-                VelY = velInicialY - Gravedad * tiempoVuelo;
-
-                if (VelY > 0)
+                // Limitar retrasos del temporizador evita atravesar plataformas tras un bloqueo.
+                double restante = Math.Max(0, Math.Min(deltaTime, 0.05));
+                while (restante > 0.0000001 && !EnElSuelo)
                 {
-                    // Subiendo: ¿choca la cabeza con el borde inferior de una plataforma?
-                    int techo = BuscarTecho(cabezaAntes, nuevaY + CuerpoY);
-                    if (techo != SinSuperficie)
+                    double gravedad = VelY > 0 ? GravedadSubida : GravedadCaida;
+                    double paso = restante;
+                    if (VelY > 0)
+                        paso = Math.Min(paso, VelY / gravedad);
+
+                    int piesAntes = PiesY;
+                    int cabezaAntes = Y + CuerpoY;
+                    double velocidadAntes = VelY;
+                    double velocidadDespues = VelY - gravedad * paso;
+                    posicionVertical -= (velocidadAntes + velocidadDespues) * 0.5 * paso;
+                    VelY = velocidadDespues;
+                    int nuevaY = (int)Math.Round(posicionVertical);
+
+                    if (velocidadAntes > 0)
                     {
-                        SetPos(X, techo - CuerpoY);
-                        EmpezarCaida();
-                        VelY = 0;
+                        int techo = BuscarTecho(cabezaAntes, nuevaY + CuerpoY);
+                        if (techo != SinSuperficie)
+                        {
+                            SetPos(X, techo - CuerpoY);
+                            EmpezarCaida();
+                        }
+                        else
+                            SetPos(X, nuevaY);
                     }
                     else
                     {
-                        SetPos(X, nuevaY);
+                        int superficie = BuscarSuperficie(piesAntes, nuevaY + PiesOffset);
+                        if (superficie != SinSuperficie)
+                        {
+                            SetPos(X, superficie - PiesOffset);
+                            posicionVertical = Y;
+                            EnElSuelo = true;
+                            SaltoParabolico = false;
+                            velx = 0;
+                            VelY = 0;
+                        }
+                        else
+                            SetPos(X, nuevaY);
                     }
-                }
-                else
-                {
-                    // Bajando: ¿cruzan los pies el tope de una plataforma o el suelo?
-                    int superficie = BuscarSuperficie(piesAntes, nuevaY + PiesOffset);
-                    if (superficie != SinSuperficie)
-                    {
-                        SetPos(X, superficie - PiesOffset);
-                        EnElSuelo = true;
-                        SaltoParabolico = false;
-                        velx = 0;
-                        VelY = 0;
-                    }
-                    else
-                    {
-                        SetPos(X, nuevaY);
-                    }
+
+                    restante -= paso;
                 }
             }
 
-            // Fin del fotograma: actualiza la animación según la dirección actual
             ActualizarAnimacion(movimientoHorizontal != 0);
-
-            // Reiniciamos el registro de entrada horizontal del fotograma
             movimientoHorizontal = 0;
         }
 
@@ -407,12 +403,11 @@ namespace PixelEsGUI
             return mejor;
         }
 
-        // Caída libre: se coloca la parábola de modo que su cima (velocidad vertical 0) quede justo aquí.
+        // Caída desde un borde o al chocar con un techo, sin impulso hacia arriba.
         void EmpezarCaida()
         {
-            double velInicialY = VelSalto * FuerzaSalto;
-            sueloY = Y + velInicialY * velInicialY / (2 * Gravedad);
-            tiempoVuelo = velInicialY / Gravedad;
+            posicionVertical = Y;
+            VelY = 0;
             EnElSuelo = false;
         }
 
