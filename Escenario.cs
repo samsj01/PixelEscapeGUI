@@ -812,25 +812,12 @@ namespace PixelEsGUI
             // Los enemigos patrullan continuamente dentro de su zona.
             ActualizarPatrullas();
 
-            // Movimiento del jugador
-            if (jugador.EnElSuelo)
-            {
-                if (derecha)
-                    jugador.MoverDer();
-                else if (izquierda)
-                    jugador.MoverIzq();
-            }
-
-            // El impulso se aplica antes del desplazamiento aéreo.
+            // Impulso y movimiento horizontal usan el mismo tiempo real.
             if (salto)
                 jugador.Saltar();
 
-            if (!jugador.EnElSuelo)
-            {
-                int direccionAire = derecha ? 1 : izquierda ? -1 : 0;
-                jugador.MoverHorizontalEnAire(direccionAire, deltaTime);
-            }
-
+            int direccionJugador = derecha ? 1 : izquierda ? -1 : 0;
+            jugador.MoverHorizontal(direccionJugador, deltaTime);
             jugador.Aterrizar(deltaTime);
 
             // La cámara sigue al jugador y este no se sale de los bordes del nivel
@@ -908,6 +895,7 @@ namespace PixelEsGUI
             {
                 jugador.SetPos(jugador.X - (cuerpo.Right - AnchoNivel), jugador.Y);
             }
+            jugador.SincronizarPosicionHorizontal();
         }
 
         // Centra la cámara en el jugador, sin mostrar nada fuera del nivel
