@@ -45,8 +45,9 @@ namespace PixelEsGUI
         int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
         double posicionVertical; // conserva fracciones de píxel entre actualizaciones
         double posicionHorizontalAire;
-        const double MultiplicadorVelocidadAire = 1.6;
-        const double FpsReferenciaMovimiento = 60.0;
+        // Velocidad aérea fija: no se duplica con el power-up de velocidad.
+        // 225 px/s * 0.65 s = ~146 px de alcance en terreno plano.
+        const double VelocidadHorizontalAire = 225.0;
 
         // ---------- Propiedades ----------
         public int Puntaje { get; private set; }
@@ -251,8 +252,7 @@ namespace PixelEsGUI
 
             movimientoHorizontal = 3;
             Direccion = direccion < 0 ? -1 : 1;
-            double paso = Velocidad * FpsReferenciaMovimiento
-                * MultiplicadorVelocidadAire * Math.Max(0, Math.Min(deltaTime, 0.05));
+            double paso = VelocidadHorizontalAire * Math.Max(0, Math.Min(deltaTime, 0.05));
             double anterior = posicionHorizontalAire;
             posicionHorizontalAire += Direccion * paso;
             SetPos((int)Math.Round(posicionHorizontalAire), Y);
