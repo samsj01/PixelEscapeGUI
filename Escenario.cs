@@ -813,19 +813,22 @@ namespace PixelEsGUI
             ActualizarPatrullas();
 
             // Movimiento del jugador
-            if (derecha)
+            if (jugador.EnElSuelo)
             {
-                jugador.MoverDer();
-            }
-            else if (izquierda)
-            {
-                jugador.MoverIzq();
+                if (derecha)
+                    jugador.MoverDer();
+                else if (izquierda)
+                    jugador.MoverIzq();
             }
 
-            // Salto
+            // El impulso se aplica antes del desplazamiento aéreo.
             if (salto)
-            {
                 jugador.Saltar();
+
+            if (!jugador.EnElSuelo)
+            {
+                int direccionAire = derecha ? 1 : izquierda ? -1 : 0;
+                jugador.MoverHorizontalEnAire(direccionAire, deltaTime);
             }
 
             jugador.Aterrizar(deltaTime);
