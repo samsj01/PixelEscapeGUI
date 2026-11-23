@@ -23,3 +23,10 @@
 !Engine2D.dll
 *.exe
 *.pdb
+
+# Bases SQLite locales y archivos auxiliares de escritura
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
