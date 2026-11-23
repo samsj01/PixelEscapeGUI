@@ -11,6 +11,10 @@
         readonly Label lblPantallaTexto = new Label();
         readonly Button btnPantalla = new Button();
         readonly Button btnContinuar = new Button();
+        readonly TextBox txtAlias = new TextBox();
+        readonly Label lblErrorAlias = new Label();
+        readonly Button btnVolverAlias = new Button();
+        bool cargandoAlias;
 
         // Mientras hay una pantalla visible el juego está detenido y se ignoran P / R / movimiento.
         bool pantallaActiva = false;
@@ -65,6 +69,34 @@
                 pantallaActiva = false;
                 SolicitarContinuacion();
             };
+            txtAlias.SetBounds(285, 280, 350, 46);
+            txtAlias.Font = new Font("Segoe UI", 17, FontStyle.Bold);
+            txtAlias.MaxLength = 40;
+            txtAlias.TextAlign = HorizontalAlignment.Center;
+            txtAlias.BorderStyle = BorderStyle.FixedSingle;
+            txtAlias.Visible = false;
+            txtAlias.KeyDown += (s, e) => {
+                if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; ConfirmarAlias(); }
+            };
+
+            lblErrorAlias.SetBounds(175, 333, 570, 30);
+            lblErrorAlias.TextAlign = ContentAlignment.MiddleCenter;
+            lblErrorAlias.ForeColor = Color.Salmon;
+            lblErrorAlias.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblErrorAlias.Visible = false;
+
+            btnVolverAlias.Text = "VOLVER";
+            btnVolverAlias.Size = new Size(170, 38);
+            btnVolverAlias.Location = new Point((panelPantalla.Width - btnVolverAlias.Width) / 2, 441);
+            btnVolverAlias.BackColor = Color.FromArgb(65, 75, 95);
+            btnVolverAlias.ForeColor = Color.White;
+            btnVolverAlias.FlatStyle = FlatStyle.Flat;
+            btnVolverAlias.Visible = false;
+            btnVolverAlias.Click += (s, e) => MostrarPantallaInicio();
+
+            panelPantalla.Controls.Add(txtAlias);
+            panelPantalla.Controls.Add(lblErrorAlias);
+            panelPantalla.Controls.Add(btnVolverAlias);
             panelPantalla.Controls.Add(btnContinuar);
             panelPantalla.Controls.Add(lblPantallaTitulo);
             panelPantalla.Controls.Add(lblPantallaSubtitulo);
@@ -89,10 +121,58 @@
             pantallaActiva = true;
 
             btnContinuar.Visible = titulo == "PIXEL ESCAPE";
+            lblPantallaTexto.Height = 160;
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 385);
+            txtAlias.Visible = false;
+            lblErrorAlias.Visible = false;
+            btnVolverAlias.Visible = false;
             panelPantalla.Visible = true;
             panelPantalla.BringToFront();
             ActiveControl = btnPantalla;
             btnPantalla.Focus();
+        }
+
+        /// <summary>Muestra un formulario de alias integrado en la pantalla del juego.</summary>
+        void MostrarPantallaAlias(bool continuar)
+        {
+            cargandoAlias = continuar;
+            MostrarPantalla(continuar ? "CONTINUAR" : "NUEVA PARTIDA",
+                continuar ? "Recupera tu aventura" : "¿Cómo quieres que te llamemos?",
+                continuar ? "Escribe el alias con el que guardaste la partida." :
+                            "Elige un nombre de jugador de hasta 40 caracteres.",
+                continuar ? "CARGAR PARTIDA" : "COMENZAR",
+                ConfirmarAlias);
+            lblPantallaTexto.Height = 65;
+            txtAlias.Text = "";
+            txtAlias.Visible = true;
+            lblErrorAlias.Text = "";
+            lblErrorAlias.Visible = true;
+            btnVolverAlias.Visible = true;
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 381);
+            txtAlias.BringToFront();
+            lblErrorAlias.BringToFront();
+            btnVolverAlias.BringToFront();
+            txtAlias.Focus();
+        }
+
+        void ConfirmarAlias()
+        {
+            string alias = txtAlias.Text.Trim();
+            if (alias.Length == 0)
+            {
+                lblErrorAlias.Text = "Escribe un nombre para continuar.";
+                txtAlias.Focus();
+                // El botón de la pantalla desactiva la acción antes de invocarla.
+                accionPantalla = ConfirmarAlias;
+                pantallaActiva = true;
+                panelPantalla.Visible = true;
+                panelPantalla.BringToFront();
+                return;
+            }
+            lblPantallaTexto.Height = 160;
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 385);
+            if (cargandoAlias) ContinuarPartida(alias);
+            else IniciarPartidaConAlias(alias);
         }
 
         // 1) Pantalla de inicio: nombre del juego y botón de empezar.
