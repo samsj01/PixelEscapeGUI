@@ -273,18 +273,29 @@ namespace PixelEsGUI
             txtAlias.Focus();
         }
 
+        // Restaura el formulario si la carga falla, sin activar el nivel.
+        void MostrarErrorContinuacion(string mensaje)
+        {
+            accionPantalla = ConfirmarAlias;
+            pantallaActiva = true;
+            panelPantalla.Visible = true;
+            panelPantalla.BringToFront();
+            txtAlias.Visible = true;
+            lblErrorAlias.Text = mensaje;
+            lblErrorAlias.Visible = true;
+            btnVolverAlias.Visible = true;
+            btnPantalla.Visible = true;
+            ActualizarDisenoPantalla();
+            txtAlias.Focus();
+            txtAlias.SelectAll();
+        }
+
         void ConfirmarAlias()
         {
             string alias = txtAlias.Text.Trim();
             if (alias.Length == 0)
             {
-                lblErrorAlias.Text = "Escribe un nombre para continuar.";
-                txtAlias.Focus();
-                // El botón de la pantalla desactiva la acción antes de invocarla.
-                accionPantalla = ConfirmarAlias;
-                pantallaActiva = true;
-                panelPantalla.Visible = true;
-                panelPantalla.BringToFront();
+                MostrarErrorContinuacion("Escribe un nombre para continuar.");
                 return;
             }
             lblPantallaTexto.Height = 160;
