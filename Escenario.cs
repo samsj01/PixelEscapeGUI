@@ -1,5 +1,6 @@
 ﻿using Engine2D;
 using System.Diagnostics;
+using PixelEsGUI.Persistencia;
 
 namespace PixelEsGUI
 {
@@ -33,6 +34,12 @@ namespace PixelEsGUI
         bool pausado = false;
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
         readonly Stopwatch relojSalto = new Stopwatch();
+        readonly RepositorioJuegoSqlite repositorio = new();
+        readonly Button btnGuardar = new Button();
+        string nombreJugador = "";
+        double tiempoPartidaSegundos;
+        int monedasTotales;
+        bool resultadoRegistrado;
         readonly System.Windows.Forms.Timer timerRespawn = new System.Windows.Forms.Timer { Interval = 520 };
         bool respawnPendiente = false;
 
@@ -69,6 +76,7 @@ namespace PixelEsGUI
             Visor.Dock = DockStyle.Fill;
 
             ConfigurarInterfaz();
+            ConfigurarBotonGuardar();
             ConfigurarPantallas(); // pantallas de inicio, controles y cambio de nivel (EscenarioPantallas.cs)
 
             jugador = new Jugador(100, Suelo - 88);
@@ -146,6 +154,8 @@ namespace PixelEsGUI
             {
                 double deltaTime = relojSalto.IsRunning ? relojSalto.Elapsed.TotalSeconds : 1.0 / 60.0;
                 relojSalto.Restart();
+                if (!pantallaActiva && !pausado && !juegoTerminado && !transicionEnCurso && !respawnPendiente)
+                    tiempoPartidaSegundos += Math.Max(0, Math.Min(deltaTime, 0.05));
                 PasoDeJuego(deltaTime);
                 ActualizarAvisosPowerUp();
             };
@@ -171,6 +181,166 @@ namespace PixelEsGUI
                 Visor.Start();
                 MostrarPantallaInicio(); // el juego empieza al pulsar EMPEZAR (el bucle arranca al cerrar las pantallas)
             };
+        }
+
+
+        /// <summary>Registra una sola vez la puntuación al terminar la partida.</summary>
+        void RegistrarResultadoFinal(string tipo)
+        {
+            if (resultadoRegistrado || string.IsNullOrWhiteSpace(nombreJugador)) return;
+            try
+            {
+                repositorio.RegistrarResultado(new ResultadoPartida {
+                    NombreJugador = nombreJugador,
+                    TiempoSegundos = tiempoPartidaSegundos,
+                    Monedas = monedasTotales,
+                    VidasRestantes = jugador.Vida,
+                    Resultado = tipo
+                });
+                resultadoRegistrado = true;
+                repositorio.EliminarGuardado(nombreJugador);
+            }
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException)
+            {
+                MessageBox.Show("No se pudo registrar la puntuación: " + ex.Message, "Persistencia");
+            }
+        }
+
+        void ConfigurarBotonGuardar()
+        {
+            btnGuardar.Text = "Guardar partida";
+            btnGuardar.Size = new Size(190, 36);
+            btnGuardar.Location = new Point((panelEstado.Width - btnGuardar.Width) / 2, 152);
+            btnGuardar.BackColor = Color.LightSteelBlue;
+            btnGuardar.Visible = false;
+            btnGuardar.Click += (s, ev) => GuardarPartidaActual();
+            panelEstado.Controls.Add(btnGuardar);
+            btnGuardar.BringToFront();
+        }
+
+        void GuardarPartidaActual()
+        {
+            if (!pausado || string.IsNullOrWhiteSpace(nombreJugador)) return;
+            try
+            {
+                var recogidos = new List<int>();
+                for (int i = 0; i < coleccionables.Count; i++)
+                    if (coleccionables[i].Recogido) recogidos.Add(i);
+                repositorio.GuardarPartida(new EstadoPartida {
+                    NombreJugador = nombreJugador,
+                    NivelActual = nivelActual,
+                    PosicionX = jugador.X, PosicionY = jugador.Y,
+                    VidasRestantes = jugador.Vida,
+                    PuntuacionAcumulada = jugador.Puntaje,
+                    MonedasNivel = monedasRecogidas, MonedasTotales = monedasTotales,
+                    TiempoAcumuladoSegundos = tiempoPartidaSegundos,
+                    TieneLlave = jugador.TieneLlave, TieneEscudo = jugador.TieneEscudo,
+                    TieneVelocidad = jugador.TieneVelocidad,
+                    PuntoControlGuardado = puntoControlGuardado,
+                    PosicionRespawnX = xRespawn, PuntajeCheckpoint = puntajeCheckpoint,
+                    EvitoCazador = evitoCazador, EvitoGuardian = evitoGuardian,
+                    IndicesColeccionablesRecogidos = recogidos,
+                    IndicesColeccionablesCheckpoint = new List<int>(indicesRecogidos)
+                });
+                MessageBox.Show("Partida guardada correctamente.", "Pixel Escape");
+            }
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                MessageBox.Show("No se pudo guardar: " + ex.Message, "Persistencia");
+            }
+        }
+
+        /// <summary>Restituye jugador, coleccionables y progreso desde SQLite.</summary>
+        void ContinuarPartida(string alias)
+        {
+            try
+            {
+                EstadoPartida? estado = repositorio.CargarPartida(alias);
+                if (estado == null) { MessageBox.Show("No hay una partida guardada para ese nombre."); return; }
+                if (estado.NivelActual is < 1 or > 3 || estado.VidasRestantes <= 0)
+                    throw new InvalidOperationException("Los datos guardados no corresponden a una partida activa.");
+                nombreJugador = estado.NombreJugador;
+                timerTransicion.Stop();
+                timerRespawn.Stop();
+                respawnPendiente = false;
+                resultadoRegistrado = false;
+                pausado = false;
+                juegoTerminado = false;
+                jugador.ReiniciarPartida();
+                CargarNivel(estado.NivelActual);
+                jugador.SetPos(estado.PosicionX, estado.PosicionY);
+                jugador.SincronizarPosicionHorizontal();
+                jugador.RestaurarDatos(estado.VidasRestantes, estado.PuntuacionAcumulada,
+                    estado.TieneLlave, estado.TieneEscudo, estado.TieneVelocidad);
+                foreach (int indice in estado.IndicesColeccionablesRecogidos ?? new List<int>())
+                    if (indice >= 0 && indice < coleccionables.Count)
+                        coleccionables[indice].Recoger(jugador);
+                // Recoger aplica efectos: restaurar los valores originales después.
+                jugador.RestaurarDatos(estado.VidasRestantes, estado.PuntuacionAcumulada,
+                    estado.TieneLlave, estado.TieneEscudo, estado.TieneVelocidad);
+                monedasRecogidas = estado.MonedasNivel;
+                monedasTotales = estado.MonedasTotales;
+                tiempoPartidaSegundos = estado.TiempoAcumuladoSegundos;
+                puntoControlGuardado = estado.PuntoControlGuardado;
+                xRespawn = estado.PosicionRespawnX;
+                puntajeCheckpoint = estado.PuntajeCheckpoint;
+                indicesRecogidos.Clear();
+                indicesRecogidos.AddRange(estado.IndicesColeccionablesCheckpoint ?? new List<int>());
+                evitoCazador = estado.EvitoCazador;
+                evitoGuardian = estado.EvitoGuardian;
+                if (puntoControlGuardado) puntoControl.Activar(jugador);
+                ActualizarContadorMonedas();
+                ActualizarIndicadorVidas();
+                panelPantalla.Visible = false;
+                pantallaActiva = false;
+                panelEstado.Visible = false;
+                btnGuardar.Visible = false;
+                relojSalto.Restart();
+                bucleJuego.Start();
+                Visor.Focus();
+            }
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
+            {
+                MessageBox.Show("No se pudo cargar la partida: " + ex.Message, "Persistencia");
+                MostrarPantallaInicio();
+            }
+        }
+
+        /// <summary>Pide un alias para iniciar o continuar una partida.</summary>
+        string? SolicitarAlias()
+        {
+            using var dialogo = new Form {
+                Text = "Nombre del jugador", ClientSize = new Size(340, 145),
+                FormBorderStyle = FormBorderStyle.FixedDialog, StartPosition = FormStartPosition.CenterParent,
+                MaximizeBox = false, MinimizeBox = false
+            };
+            var etiqueta = new Label { Text = "Escribe tu nombre (máximo 40 caracteres):", Left = 15, Top = 15, AutoSize = true };
+            var campo = new TextBox { Left = 15, Top = 45, Width = 305, MaxLength = 40 };
+            var aceptar = new Button { Text = "Aceptar", Left = 125, Top = 95, Width = 90, DialogResult = DialogResult.OK };
+            var cancelar = new Button { Text = "Cancelar", Left = 230, Top = 95, Width = 90, DialogResult = DialogResult.Cancel };
+            dialogo.Controls.AddRange(new Control[] { etiqueta, campo, aceptar, cancelar });
+            dialogo.AcceptButton = aceptar;
+            dialogo.CancelButton = cancelar;
+            if (dialogo.ShowDialog(this) != DialogResult.OK) return null;
+            string alias = campo.Text.Trim();
+            if (alias.Length == 0) { MessageBox.Show("El nombre no puede estar vacío."); return null; }
+            return alias;
+        }
+
+        void ComenzarNuevaPartida()
+        {
+            string? alias = SolicitarAlias();
+            if (alias == null) { MostrarPantallaInicio(); return; }
+            nombreJugador = alias;
+            ReiniciarPartidaCompleta();
+            MostrarPantallaControles();
+        }
+
+        void SolicitarContinuacion()
+        {
+            string? alias = SolicitarAlias();
+            if (alias == null) { MostrarPantallaInicio(); return; }
+            ContinuarPartida(alias);
         }
 
         void ConfigurarInterfaz()
@@ -352,6 +522,7 @@ namespace PixelEsGUI
             pausado = false;
             bucleJuego.Stop();
             relojSalto.Reset();
+            RegistrarResultadoFinal("victoria");
             MostrarPanelEstado("¡VICTORIA!", "¡Felicitaciones! Completaste los tres niveles de Pixel Escape.", "Jugar nuevamente");
         }
 
@@ -366,7 +537,11 @@ namespace PixelEsGUI
             juegoTerminado = false;
             transicionEnCurso = false;
             panelEstado.Visible = false;
+            btnGuardar.Visible = false;
             jugador.ReiniciarPartida();
+            tiempoPartidaSegundos = 0;
+            monedasTotales = 0;
+            resultadoRegistrado = false;
             escudoAnterior = false;
             velocidadAnterior = false;
             avisoTemporalPowerUp = "";
@@ -390,10 +565,13 @@ namespace PixelEsGUI
                 bucleJuego.Stop();
                 relojSalto.Reset();
                 MostrarPanelEstado("JUEGO EN PAUSA", "Pulsa P o el botón para continuar.", "Reanudar");
+                btnGuardar.Visible = true;
+                btnGuardar.BringToFront();
             }
             else
             {
                 panelEstado.Visible = false;
+                btnGuardar.Visible = false;
                 relojSalto.Restart();
                 bucleJuego.Start();
             }
@@ -403,6 +581,7 @@ namespace PixelEsGUI
         {
             pausado = false;
             panelEstado.Visible = false;
+            btnGuardar.Visible = false;
             relojSalto.Restart();
                 bucleJuego.Start();
             Visor.Focus();
@@ -838,6 +1017,7 @@ namespace PixelEsGUI
                     if (item is Moneda)
                     {
                         monedasRecogidas++;
+                        monedasTotales++;
                     }
                 }
             }
@@ -1124,6 +1304,7 @@ namespace PixelEsGUI
                 // La partida queda detenida hasta que el usuario pulse el botón de reinicio.
                 juegoTerminado = true;
                 bucleJuego.Stop();
+                RegistrarResultadoFinal("derrota");
                 MostrarPanelEstado("GAME OVER", "Has perdido tus tres vidas.", "Volver a jugar");
             }
             else
