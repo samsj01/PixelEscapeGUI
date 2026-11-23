@@ -37,10 +37,7 @@ namespace PixelEsGUI
         int direccionAnimacion;
 
         // ---------- Estado del salto en curso ----------
-        double velx;               // velocidad horizontal del salto (negativa = izquierda)
-        double angulo;
         int movimientoHorizontal;  // -1 izquierda, 0 quieto, 1 derecha (solo en el fotograma actual)
-        int origenX;
         double sueloY;             // altura (Y) de la que parte la parábola actual
         int sueloBaseY;            // Y del jugador cuando está parado en el suelo principal
         double posicionVertical; // conserva fracciones de píxel entre actualizaciones
@@ -86,6 +83,18 @@ namespace PixelEsGUI
         public void EstablecerPuntaje(int puntos)
         {
             Puntaje = puntos;
+        }
+
+        /// <summary>Restituye vidas e inventario desde un guardado verificado.</summary>
+        public void RestaurarDatos(int vidas, int puntos, bool llave, bool escudo, bool velocidad)
+        {
+            Vida = Math.Max(0, vidas);
+            Puntaje = Math.Max(0, puntos);
+            TieneLlave = llave;
+            TieneEscudo = escudo;
+            fotogramasVelocidad = 0;
+            Velocidad = VelocidadNormal;
+            if (velocidad) ActivarVelocidadTemporal(5);
         }
 
         public void ReiniciarPartida()
@@ -199,8 +208,6 @@ namespace PixelEsGUI
             EnElSuelo = true;
             SaltoParabolico = false;
             VelY = 0;
-
-            velx = 0;
             posicionVertical = y;
             posicionHorizontalAire = x;
             movimientoHorizontal = 0;
@@ -351,7 +358,6 @@ namespace PixelEsGUI
                             EnElSuelo = true;
                             posicionHorizontalAire = X;
                             SaltoParabolico = false;
-                            velx = 0;
                             VelY = 0;
                         }
                         else
