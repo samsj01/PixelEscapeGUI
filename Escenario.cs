@@ -35,6 +35,8 @@ namespace PixelEsGUI
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
         readonly Stopwatch relojSalto = new Stopwatch();
         readonly RepositorioJuegoSqlite repositorio = new();
+        readonly GestorAudio audio = new();
+        bool saltoPresionadoAnterior;
         readonly Button btnGuardar = new Button();
         readonly Button btnVolverInicio = new Button();
         string nombreJugador = "";
@@ -79,6 +81,7 @@ namespace PixelEsGUI
             ConfigurarInterfaz();
             ConfigurarBotonesPausa();
             ConfigurarPantallas(); // pantallas de inicio, controles y cambio de nivel (EscenarioPantallas.cs)
+            FormClosed += (_, _) => audio.Dispose();
 
             jugador = new Jugador(100, Suelo - 88);
             scene.AddItem(jugador);
@@ -119,6 +122,8 @@ namespace PixelEsGUI
                 salto = false;
 
                 // Reiniciar el nivel actual
+                audio.DetenerMusica();
+                audio.IniciarMusica();
                 CargarNivel(nivelActual);
 
                 // Asegurar que el jugador siga visible
@@ -218,7 +223,7 @@ namespace PixelEsGUI
             btnGuardar.FlatStyle = FlatStyle.Flat;
             btnGuardar.Visible = false;
             btnVolverInicio.Visible = false;
-            btnGuardar.Click += (s, ev) => GuardarPartidaActual();
+            btnGuardar.Click += (s, ev) => { audio.Efecto("button"); GuardarPartidaActual(); };
             panelEstado.Controls.Add(btnGuardar);
             btnGuardar.BringToFront();
 
@@ -233,7 +238,9 @@ namespace PixelEsGUI
             btnVolverInicio.Click += (s, ev) =>
             {
                 // Si falla el guardado, permanece en pausa para no perder progreso.
+                audio.Efecto("button");
                 if (!GuardarPartidaActual(false)) return;
+                audio.DetenerMusica();
                 pausado = false;
                 izquierda = derecha = salto = false;
                 panelEstado.Visible = false;
@@ -330,6 +337,7 @@ namespace PixelEsGUI
                 btnGuardar.Visible = false;
             btnVolverInicio.Visible = false;
                 relojSalto.Restart();
+                audio.IniciarMusica();
                 bucleJuego.Start();
                 Visor.Focus();
             }
@@ -424,7 +432,7 @@ namespace PixelEsGUI
             btnEstado.Click += (s, e) =>
             {
                 if (pausado) BtnReanudar_Click(s, e);
-                else ReiniciarPartidaCompleta();
+                else { audio.Efecto("button"); ReiniciarPartidaCompleta(); }
             };
 
             panelEstado.Controls.Add(lblMensajeEstado);
@@ -538,12 +546,15 @@ namespace PixelEsGUI
             pausado = false;
             bucleJuego.Stop();
             relojSalto.Reset();
+            audio.DetenerMusica();
+            audio.Efecto("victory");
             RegistrarResultadoFinal("victoria");
             MostrarPanelEstado("¡VICTORIA!", "¡Felicitaciones! Completaste los tres niveles de Pixel Escape.", "Jugar nuevamente");
         }
 
         void ReiniciarPartidaCompleta()
         {
+            audio.DetenerMusica();
             timerTransicion.Stop();
             timerRespawn.Stop();
             respawnPendiente = false;
@@ -580,6 +591,7 @@ namespace PixelEsGUI
             if (pausado)
             {
                 bucleJuego.Stop();
+                audio.PausarMusica();
                 relojSalto.Reset();
                 MostrarPanelEstado("JUEGO EN PAUSA", "Pulsa P o el botón para continuar.", "Reanudar");
                 btnGuardar.Visible = true;
@@ -593,12 +605,15 @@ namespace PixelEsGUI
                 btnGuardar.Visible = false;
             btnVolverInicio.Visible = false;
                 relojSalto.Restart();
+                audio.ReanudarMusica();
                 bucleJuego.Start();
             }
         }
 
         void BtnReanudar_Click(object? sender, EventArgs e)
         {
+            audio.Efecto("button");
+            audio.ReanudarMusica();
             pausado = false;
             panelEstado.Visible = false;
             btnGuardar.Visible = false;
@@ -1014,7 +1029,11 @@ namespace PixelEsGUI
 
             // Impulso y movimiento horizontal usan el mismo tiempo real.
             if (salto)
+            {
+                if (!saltoPresionadoAnterior) audio.Efecto("jump");
                 jugador.Saltar();
+            }
+            saltoPresionadoAnterior = salto;
 
             int direccionJugador = derecha ? 1 : izquierda ? -1 : 0;
             jugador.MoverHorizontal(direccionJugador, deltaTime);
@@ -1034,6 +1053,8 @@ namespace PixelEsGUI
                 if (!item.Recogido && colisionColeccionable)
                 {
                     item.Recoger(jugador);
+                    if (item is Moneda) audio.Efecto("coin");
+                    else audio.Efecto("powerUpKey");
 
                     if (item is Moneda)
                     {
@@ -1318,6 +1339,7 @@ namespace PixelEsGUI
         void ResolverImpacto()
         {
             izquierda = derecha = salto = false;
+            audio.Efecto("die");
             ActualizarIndicadorVidas();
 
             if (!jugador.EstaVivo)
@@ -1325,6 +1347,8 @@ namespace PixelEsGUI
                 // La partida queda detenida hasta que el usuario pulse el botón de reinicio.
                 juegoTerminado = true;
                 bucleJuego.Stop();
+                audio.DetenerMusica();
+                audio.Efecto("gameOver");
                 RegistrarResultadoFinal("derrota");
                 MostrarPanelEstado("GAME OVER", "Has perdido tus tres vidas.", "Volver a jugar");
             }
@@ -1797,6 +1821,8 @@ namespace PixelEsGUI
                 if (CumpleObjetivosNivel())
                 {
                     puerta.Abrir();
+                    audio.DetenerMusica();
+                    audio.Efecto("door");
 
                     transicionEnCurso = true;
 

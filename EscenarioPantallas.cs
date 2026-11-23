@@ -54,6 +54,7 @@
                 if ((DateTime.Now - instantePantalla).TotalMilliseconds < 300) return;
                 Action? accion = accionPantalla;
                 if (accion == null) return;
+                audio.Efecto("button");
                 accionPantalla = null;
                 pantallaActiva = false;
                 panelPantalla.Visible = false;
@@ -70,6 +71,7 @@
             btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 448);
             btnContinuar.Visible = false;
             btnContinuar.Click += (s, e) => {
+                audio.Efecto("button");
                 panelPantalla.Visible = false;
                 pantallaActiva = false;
                 SolicitarContinuacion();
@@ -97,7 +99,7 @@
             btnVolverAlias.ForeColor = Color.White;
             btnVolverAlias.FlatStyle = FlatStyle.Flat;
             btnVolverAlias.Visible = false;
-            btnVolverAlias.Click += (s, e) => MostrarPantallaInicio();
+            btnVolverAlias.Click += (s, e) => { audio.Efecto("button"); MostrarPantallaInicio(); };
 
             panelPantalla.Controls.Add(txtAlias);
             panelPantalla.Controls.Add(lblErrorAlias);
@@ -183,6 +185,7 @@
         // 1) Pantalla de inicio: nombre del juego y botón de empezar.
         void MostrarPantallaInicio()
         {
+            audio.DetenerMusica();
             MostrarPantalla("PIXEL ESCAPE", "Escapa a través de tres niveles", "", "EMPEZAR",
                 ComenzarNuevaPartida);
         }
@@ -222,6 +225,7 @@
             MostrarPantalla("NIVEL " + nivel, subtitulo, objetivo, "COMENZAR", () =>
             {
                 this.Text = "Pixel Escape - Nivel " + nivel;
+                audio.IniciarMusica();
                 bucleJuego.Start();
                 Visor.Focus();
             });
