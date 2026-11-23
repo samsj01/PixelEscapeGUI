@@ -337,6 +337,7 @@ namespace PixelEsGUI
                 btnGuardar.Visible = false;
             btnVolverInicio.Visible = false;
                 relojSalto.Restart();
+                audio.IniciarMusica();
                 bucleJuego.Start();
                 Visor.Focus();
             }
@@ -431,7 +432,7 @@ namespace PixelEsGUI
             btnEstado.Click += (s, e) =>
             {
                 if (pausado) BtnReanudar_Click(s, e);
-                else ReiniciarPartidaCompleta();
+                else { audio.Efecto("button"); ReiniciarPartidaCompleta(); }
             };
 
             panelEstado.Controls.Add(lblMensajeEstado);
