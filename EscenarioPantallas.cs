@@ -1,10 +1,20 @@
-﻿namespace PixelEsGUI
+namespace PixelEsGUI
 {
     // Pantallas a ventana completa (BORRADOR funcional, sin diseño visual todavía):
-    //   inicio -> controles -> "Nivel 1" -> juego ... -> "Nivel 2" -> juego ... -> "Nivel 3" -> juego -> victoria
-    // Una sola pantalla reutilizable (panelPantalla) que cambia de textos y de acción del botón.
     public partial class Escenario
     {
+        // Paleta pastel y tipografías compartidas por todas las pantallas previas al nivel.
+        static readonly Color ColorFondoPantalla = Color.FromArgb(190, 225, 247); // azul claro
+        static readonly Color ColorTituloPantalla = Color.FromArgb(111, 62, 161); // morado
+        static readonly Color ColorTextoPantalla = Color.FromArgb(35, 76, 115); // azul profundo
+        static readonly Color ColorBotonPantalla = Color.FromArgb(246, 185, 211); // rosa pastel
+        static readonly Color ColorBotonHover = Color.FromArgb(255, 205, 226);
+        static readonly Color ColorBotonPresionado = Color.FromArgb(231, 151, 188);
+        static readonly Font FuenteTituloPantalla = new Font("Ravie", 36, FontStyle.Regular);
+        static readonly Font FuenteSubtituloPantalla = new Font("Bradley Hand ITC", 17, FontStyle.Bold);
+        static readonly Font FuenteTextoPantalla = new Font("Bradley Hand ITC", 13, FontStyle.Bold);
+        static readonly Font FuenteBotonPantalla = new Font("Bauhaus 93", 12, FontStyle.Regular);
+
         readonly Panel panelPantalla = new Panel();
         readonly Label lblPantallaTitulo = new Label();
         readonly Label lblPantallaSubtitulo = new Label();
@@ -24,30 +34,39 @@
         void ConfigurarPantallas()
         {
             panelPantalla.SetBounds(0, 0, ClientSize.Width, ClientSize.Height);
-            panelPantalla.BackColor = Color.FromArgb(20, 24, 40);
+            panelPantalla.BackColor = ColorFondoPantalla;
             panelPantalla.Visible = false;
 
             lblPantallaTitulo.SetBounds(0, 55, panelPantalla.Width, 90);
             lblPantallaTitulo.TextAlign = ContentAlignment.MiddleCenter;
-            lblPantallaTitulo.ForeColor = Color.White;
-            lblPantallaTitulo.Font = new Font("Segoe UI", 38, FontStyle.Bold);
+            lblPantallaTitulo.ForeColor = ColorTituloPantalla;
+            lblPantallaTitulo.Font = FuenteTituloPantalla;
 
             lblPantallaSubtitulo.SetBounds(0, 145, panelPantalla.Width, 40);
             lblPantallaSubtitulo.TextAlign = ContentAlignment.MiddleCenter;
-            lblPantallaSubtitulo.ForeColor = Color.Gold;
-            lblPantallaSubtitulo.Font = new Font("Segoe UI", 18, FontStyle.Italic);
+            lblPantallaSubtitulo.ForeColor = ColorTextoPantalla;
+            lblPantallaSubtitulo.Font = FuenteSubtituloPantalla;
 
             lblPantallaTexto.SetBounds(110, 200, panelPantalla.Width - 220, 160);
             lblPantallaTexto.TextAlign = ContentAlignment.MiddleCenter;
-            lblPantallaTexto.ForeColor = Color.Gainsboro;
-            lblPantallaTexto.Font = new Font("Segoe UI", 15, FontStyle.Bold);
+            lblPantallaTexto.ForeColor = ColorTextoPantalla;
+            lblPantallaTexto.Font = FuenteTextoPantalla;
 
-            btnPantalla.Size = new Size(220, 52);
-            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 385);
-            btnPantalla.Font = new Font("Segoe UI", 13, FontStyle.Bold);
-            btnPantalla.BackColor = Color.White;
-            btnPantalla.ForeColor = Color.FromArgb(30, 30, 30);
+            btnPantalla.Size = new Size(280, 58);
+            btnPantalla.MinimumSize = new Size(280, 58);
+            btnPantalla.MaximumSize = new Size(280, 58);
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 330);
+            btnPantalla.Font = FuenteBotonPantalla;
+            btnPantalla.TextAlign = ContentAlignment.MiddleCenter;
+            btnPantalla.AutoSize = false;
+            btnPantalla.UseVisualStyleBackColor = false;
+            btnPantalla.Padding = Padding.Empty;
+            btnPantalla.BackColor = ColorBotonPantalla;
+            btnPantalla.ForeColor = Color.Black;
             btnPantalla.FlatStyle = FlatStyle.Flat;
+            btnPantalla.FlatAppearance.BorderSize = 0;
+            btnPantalla.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnPantalla.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
             btnPantalla.Click += (s, e) =>
             {
                 // Evita doble disparo (Enter mantenido / Enter + clic) al encadenar pantallas.
@@ -62,13 +81,21 @@
             };
 
             btnContinuar.Text = "CONTINUAR PARTIDA";
-            btnContinuar.Size = new Size(220, 52);
-            btnContinuar.Font = new Font("Segoe UI", 13, FontStyle.Bold);
-            btnContinuar.BackColor = Color.White;
-            btnContinuar.ForeColor = Color.FromArgb(30, 30, 30);
+            btnContinuar.Size = new Size(280, 58);
+            btnContinuar.MinimumSize = new Size(280, 58);
+            btnContinuar.MaximumSize = new Size(280, 58);
+            btnContinuar.Font = FuenteBotonPantalla;
+            btnContinuar.TextAlign = ContentAlignment.MiddleCenter;
+            btnContinuar.AutoSize = false;
+            btnContinuar.UseVisualStyleBackColor = false;
+            btnContinuar.Padding = Padding.Empty;
+            btnContinuar.BackColor = ColorBotonPantalla;
+            btnContinuar.ForeColor = Color.Black;
             btnContinuar.FlatStyle = FlatStyle.Flat;
             btnContinuar.FlatAppearance.BorderSize = 0;
-            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 448);
+            btnContinuar.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnContinuar.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
+            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 380);
             btnContinuar.Visible = false;
             btnContinuar.Click += (s, e) => {
                 audio.Efecto("button");
@@ -77,7 +104,9 @@
                 SolicitarContinuacion();
             };
             txtAlias.SetBounds(285, 280, 350, 46);
-            txtAlias.Font = new Font("Segoe UI", 17, FontStyle.Bold);
+            txtAlias.Font = new Font("Bradley Hand ITC", 15, FontStyle.Bold);
+            txtAlias.BackColor = Color.White;
+            txtAlias.ForeColor = ColorTextoPantalla;
             txtAlias.MaxLength = 40;
             txtAlias.TextAlign = HorizontalAlignment.Center;
             txtAlias.BorderStyle = BorderStyle.FixedSingle;
@@ -88,16 +117,20 @@
 
             lblErrorAlias.SetBounds(175, 333, 570, 30);
             lblErrorAlias.TextAlign = ContentAlignment.MiddleCenter;
-            lblErrorAlias.ForeColor = Color.Salmon;
-            lblErrorAlias.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            lblErrorAlias.ForeColor = Color.FromArgb(173, 52, 91);
+            lblErrorAlias.Font = new Font("Bradley Hand ITC", 10, FontStyle.Bold);
             lblErrorAlias.Visible = false;
 
             btnVolverAlias.Text = "VOLVER";
             btnVolverAlias.Size = new Size(170, 38);
             btnVolverAlias.Location = new Point((panelPantalla.Width - btnVolverAlias.Width) / 2, 441);
-            btnVolverAlias.BackColor = Color.FromArgb(65, 75, 95);
-            btnVolverAlias.ForeColor = Color.White;
+            btnVolverAlias.BackColor = ColorBotonPantalla;
+            btnVolverAlias.ForeColor = Color.Black;
+            btnVolverAlias.Font = FuenteBotonPantalla;
             btnVolverAlias.FlatStyle = FlatStyle.Flat;
+            btnVolverAlias.FlatAppearance.BorderSize = 0;
+            btnVolverAlias.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnVolverAlias.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
             btnVolverAlias.Visible = false;
             btnVolverAlias.Click += (s, e) => { audio.Efecto("button"); MostrarPantallaInicio(); };
 
@@ -129,7 +162,16 @@
 
             btnContinuar.Visible = titulo == "PIXEL ESCAPE";
             lblPantallaTexto.Height = 160;
-            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 385);
+            // Distribución basada en la altura real del panel: evita solapamientos
+            // y garantiza que los dos botones de inicio queden completos y visibles.
+            int yBotonPrincipal = titulo == "PIXEL ESCAPE"
+                ? Math.Max(280, panelPantalla.Height - 165)
+                : Math.Max(300, panelPantalla.Height - 105);
+            int yBotonContinuar = panelPantalla.Height - 92;
+            btnPantalla.Size = new Size(280, 58);
+            btnContinuar.Size = new Size(280, 58);
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, yBotonPrincipal);
+            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, yBotonContinuar);
             txtAlias.Visible = false;
             lblErrorAlias.Visible = false;
             btnVolverAlias.Visible = false;
@@ -155,7 +197,7 @@
             lblErrorAlias.Text = "";
             lblErrorAlias.Visible = true;
             btnVolverAlias.Visible = true;
-            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 381);
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 365);
             txtAlias.BringToFront();
             lblErrorAlias.BringToFront();
             btnVolverAlias.BringToFront();
@@ -177,7 +219,7 @@
                 return;
             }
             lblPantallaTexto.Height = 160;
-            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 385);
+            btnPantalla.Location = new Point((panelPantalla.Width - btnPantalla.Width) / 2, 370);
             if (cargandoAlias) ContinuarPartida(alias);
             else IniciarPartidaConAlias(alias);
         }

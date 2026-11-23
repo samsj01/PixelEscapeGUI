@@ -5,15 +5,18 @@ namespace PixelEsGUI
     // Enemigo del Nivel 2: más rápido que el Guardián y solo ataca dentro de su rango.
     internal class CazadorPixel : Enemigo
     {
-        const int VelocidadCazador = 3;
-        const double RangoPorDefecto = 50;
+        const int VelocidadCazador = 1;
+        const double RangoPorDefecto = 360;
+        const double TiempoRecargaDisparo = 1.9;
+        const double DuracionAnimacionDisparo = 0.62;
+        double recargaRestante;
+        double animacionAtaqueRestante;
+        bool estadoActualAtaque;
+
+        public bool PuedeDisparar => recargaRestante <= 0;
+        public bool EstaEnAnimacionAtaque => animacionAtaqueRestante > 0;
 
         // ---------- Hoja de sprites (Resources/cazador_sheet.png) ----------
-        // 10 columnas y 7 filas de cuadros de 96x96:
-        //   fila 0: quieto izq (6)    fila 1: quieto der (6)
-        //   fila 2: camina izq (4)    fila 3: camina der (4)
-        //   fila 4: dispara izq (8)   fila 5: dispara der (8)
-        //   fila 6: muerte / polvo (10), sin dirección
         const int FilasHoja = 7;
         const int FilaQuieto = 0;
         const int FilaCamina = 2;
@@ -54,6 +57,26 @@ namespace PixelEsGUI
         }
 
         // true si el objetivo está dentro del rango de detección.
+        public void ActualizarTemporizadores(double deltaTime)
+        {
+            double dt = Math.Clamp(deltaTime, 0, 0.05);
+            recargaRestante = Math.Max(0, recargaRestante - dt);
+            animacionAtaqueRestante = Math.Max(0, animacionAtaqueRestante - dt);
+            if (animacionAtaqueRestante <= 0 && estadoActualAtaque)
+            {
+                estadoActualAtaque = false;
+                Animar(EstadoAnimacion.Quieto);
+            }
+        }
+
+        public void IniciarAtaque()
+        {
+            recargaRestante = TiempoRecargaDisparo;
+            animacionAtaqueRestante = DuracionAnimacionDisparo;
+            estadoActualAtaque = true;
+            Animar(EstadoAnimacion.Ataca);
+        }
+
         public bool Detecta(Personaje objetivo)
         {
             double deltaX = X - objetivo.X;

@@ -19,10 +19,6 @@ namespace PixelEsGUI
         const double ImpulsoSalto = GravedadSubida * TiempoSubida;
 
         // ---------- Hoja de sprites (Resources/jugador_sheet.png) ----------
-        // 8 cuadros por fila y 6 filas. Solo hay animaciones hacia abajo (izquierda y derecha):
-        //   fila 0: quieto izq    fila 1: quieto der
-        //   fila 2: camina izq    fila 3: camina der
-        //   fila 4: salta izq     fila 5: salta der
         const int ColumnasHoja = 8;
         const int FilasHoja = 6;
         const int FilaQuieto = 0;
@@ -112,7 +108,7 @@ namespace PixelEsGUI
         {
             if (fotogramasVelocidad <= 0)
                 velocidadAnterior = Velocidad;
-            Velocidad = 10;
+            Velocidad = 8;
             fotogramasVelocidad = Math.Max(1, duracionSegundos) * 60;
         }
 

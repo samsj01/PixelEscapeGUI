@@ -1,4 +1,4 @@
-﻿using Engine2D;
+using Engine2D;
 using System.Diagnostics;
 using PixelEsGUI.Persistencia;
 
@@ -10,6 +10,7 @@ namespace PixelEsGUI
         Jugador jugador;
         // Cada nivel puede tener varios cazadores, guardianes y trampas.
         readonly List<CazadorPixel> cazadores = new List<CazadorPixel>();
+        readonly List<FlechaCazador> flechasCazador = new List<FlechaCazador>();
         readonly List<GuardianPixel> guardianes = new List<GuardianPixel>();
         readonly List<Trampa> trampas = new List<Trampa>();
         readonly Dictionary<Enemigo, (int Min, int Max)> limitesPatrulla = new Dictionary<Enemigo, (int Min, int Max)>();
@@ -51,6 +52,8 @@ namespace PixelEsGUI
         readonly Label lblPowerUps = new Label();
         readonly Label lblMonedas = new Label(); // contador de monedas, debajo de las vidas
         string textoMonedas = "";
+        int vidasIndicador = -1;
+        Color colorMonedasIndicador = Color.Empty;
         readonly Panel panelEstado = new Panel();
         readonly Label lblTituloEstado = new Label();
         readonly Label lblMensajeEstado = new Label();
@@ -217,10 +220,13 @@ namespace PixelEsGUI
             btnGuardar.Text = "Guardar partida";
             btnGuardar.Size = new Size(260, 42);
             btnGuardar.Location = new Point((panelEstado.Width - btnGuardar.Width) / 2, 190);
-            btnGuardar.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-            btnGuardar.BackColor = Color.FromArgb(226, 235, 250);
-            btnGuardar.ForeColor = Color.FromArgb(25, 35, 55);
+            btnGuardar.Font = FuenteBotonPantalla;
+            btnGuardar.BackColor = ColorBotonPantalla;
+            btnGuardar.ForeColor = Color.Black;
             btnGuardar.FlatStyle = FlatStyle.Flat;
+            btnGuardar.FlatAppearance.BorderSize = 0;
+            btnGuardar.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnGuardar.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
             btnGuardar.Visible = false;
             btnVolverInicio.Visible = false;
             btnGuardar.Click += (s, ev) => { audio.Efecto("button"); GuardarPartidaActual(); };
@@ -230,10 +236,13 @@ namespace PixelEsGUI
             btnVolverInicio.Text = "VOLVER AL INICIO";
             btnVolverInicio.Size = new Size(260, 42);
             btnVolverInicio.Location = new Point((panelEstado.Width - btnVolverInicio.Width) / 2, 242);
-            btnVolverInicio.Font = new Font("Segoe UI", 12, FontStyle.Bold);
-            btnVolverInicio.BackColor = Color.FromArgb(226, 235, 250);
-            btnVolverInicio.ForeColor = Color.FromArgb(25, 35, 55);
+            btnVolverInicio.Font = FuenteBotonPantalla;
+            btnVolverInicio.BackColor = ColorBotonPantalla;
+            btnVolverInicio.ForeColor = Color.Black;
             btnVolverInicio.FlatStyle = FlatStyle.Flat;
+            btnVolverInicio.FlatAppearance.BorderSize = 0;
+            btnVolverInicio.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnVolverInicio.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
             btnVolverInicio.Visible = false;
             btnVolverInicio.Click += (s, ev) =>
             {
@@ -370,7 +379,7 @@ namespace PixelEsGUI
         void ConfigurarInterfaz()
         {
             lblVidas.AutoSize = true;
-            lblVidas.Font = new Font("Segoe UI", 22, FontStyle.Bold);
+            lblVidas.Font = new Font("Bradley Hand ITC", 22, FontStyle.Bold);
             lblVidas.ForeColor = Color.Crimson;
             lblVidas.BackColor = Color.Transparent;
             lblVidas.Padding = new Padding(2);
@@ -380,7 +389,7 @@ namespace PixelEsGUI
 
             // Contador de monedas
             lblMonedas.AutoSize = true;
-            lblMonedas.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+            lblMonedas.Font = new Font("Bradley Hand ITC", 16, FontStyle.Bold);
             lblMonedas.ForeColor = Color.Gold;
             lblMonedas.BackColor = Color.Transparent;
             lblMonedas.Padding = new Padding(2);
@@ -390,7 +399,7 @@ namespace PixelEsGUI
 
             lblPowerUps.AutoSize = false;
             lblPowerUps.Size = new Size(260, 58);
-            lblPowerUps.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            lblPowerUps.Font = new Font("Bradley Hand ITC", 10, FontStyle.Bold);
             lblPowerUps.ForeColor = Color.White;
             lblPowerUps.BackColor = Color.FromArgb(150, 25, 35, 45);
             lblPowerUps.Padding = new Padding(8, 5, 8, 5);
@@ -401,7 +410,7 @@ namespace PixelEsGUI
 
             // Panel amplio
             panelEstado.Size = new Size(520, 320);
-            panelEstado.BackColor = Color.FromArgb(241, 245, 252);
+            panelEstado.BackColor = ColorFondoPantalla;
             panelEstado.BorderStyle = BorderStyle.FixedSingle;
             panelEstado.Location = new Point((ClientSize.Width - panelEstado.Width) / 2,
                                              (ClientSize.Height - panelEstado.Height) / 2);
@@ -410,25 +419,28 @@ namespace PixelEsGUI
             lblTituloEstado.Dock = DockStyle.Top;
             lblTituloEstado.Height = 66;
             lblTituloEstado.TextAlign = ContentAlignment.MiddleCenter;
-            lblTituloEstado.ForeColor = Color.Firebrick;
-            lblTituloEstado.Font = new Font("Segoe UI", 23, FontStyle.Bold);
+            lblTituloEstado.ForeColor = ColorTituloPantalla;
+            lblTituloEstado.Font = new Font("Ravie", 24, FontStyle.Regular);
             lblTituloEstado.Padding = new Padding(12, 8, 12, 2);
 
             lblMensajeEstado.Dock = DockStyle.Top;
             lblMensajeEstado.Height = 65;
             lblMensajeEstado.TextAlign = ContentAlignment.MiddleCenter;
-            lblMensajeEstado.ForeColor = Color.FromArgb(35, 35, 35);
-            lblMensajeEstado.Font = new Font("Segoe UI", 15, FontStyle.Bold);
+            lblMensajeEstado.ForeColor = ColorTextoPantalla;
+            lblMensajeEstado.Font = new Font("Bradley Hand ITC", 13, FontStyle.Bold);
             lblMensajeEstado.Padding = new Padding(24, 4, 24, 4);
             lblMensajeEstado.AutoEllipsis = true;
 
             btnEstado.Text = "Volver a jugar";
             btnEstado.Size = new Size(260, 44);
-            btnEstado.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            btnEstado.Font = FuenteBotonPantalla;
             btnEstado.Location = new Point((panelEstado.Width - btnEstado.Width) / 2, 138);
-            btnEstado.BackColor = Color.White;
-            btnEstado.ForeColor = Color.FromArgb(30, 30, 30);
+            btnEstado.BackColor = ColorBotonPantalla;
+            btnEstado.ForeColor = Color.Black;
             btnEstado.FlatStyle = FlatStyle.Flat;
+            btnEstado.FlatAppearance.BorderSize = 0;
+            btnEstado.FlatAppearance.MouseOverBackColor = ColorBotonHover;
+            btnEstado.FlatAppearance.MouseDownBackColor = ColorBotonPresionado;
             btnEstado.Click += (s, e) =>
             {
                 if (pausado) BtnReanudar_Click(s, e);
@@ -459,15 +471,21 @@ namespace PixelEsGUI
                 textoMonedas = texto;
                 lblMonedas.Text = texto;
             }
-            lblMonedas.ForeColor = monedasRecogidas >= meta ? Color.LimeGreen : Color.Gold;
+            Color color = monedasRecogidas >= meta ? Color.LimeGreen : Color.Gold;
+            if (colorMonedasIndicador != color)
+            {
+                colorMonedasIndicador = color;
+                lblMonedas.ForeColor = color;
+            }
         }
 
         void ActualizarIndicadorVidas()
         {
             if (jugador == null) return;
             int vidas = Math.Max(0, Math.Min(3, jugador.Vida));
-            lblVidas.Text = string.Join(" ", Enumerable.Repeat("♥", vidas));
-            if (vidas == 0) lblVidas.Text = "";
+            if (vidas == vidasIndicador) return;
+            vidasIndicador = vidas;
+            lblVidas.Text = vidas == 0 ? "" : string.Join(" ", Enumerable.Repeat("♥", vidas));
         }
 
         void ActualizarAvisosPowerUp()
@@ -974,12 +992,80 @@ namespace PixelEsGUI
         // Posición X del punto de control de cada nivel
         readonly int[] xPuntoControl = { 1060, 1400, 1800 };
 
-        void ActualizarPatrullas()
+        // Culling visual: los objetos fuera del área de cámara (con margen) no se dibujan.
+        // No se eliminan del escenario ni se altera su posición o colisión.
+        const int MargenVisibilidad = 128;
+
+        bool EnZonaVisible(int x, int y, float ancho, float alto)
+        {
+            float izquierda = scene.CamaraX - MargenVisibilidad;
+            float derecha = scene.CamaraX + scene.Width + MargenVisibilidad;
+            float arriba = -MargenVisibilidad;
+            float abajo = scene.Height + MargenVisibilidad;
+            return x + ancho >= izquierda && x <= derecha && y + alto >= arriba && y <= abajo;
+        }
+
+        void ActualizarVisibilidadCamara()
+        {
+            foreach (var item in decoraciones)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in obstaculos)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in obstaculosSprite)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in coleccionables)
+            {
+                bool visible = !item.Recogido && EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in trampas)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in cazadores)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in guardianes)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            foreach (var item in flechasCazador)
+            {
+                bool visible = EnZonaVisible(item.X, item.Y, item.Ancho, item.Alto);
+                if (item.Visible != visible) item.Visible = visible;
+            }
+            if (puerta != null)
+            {
+                bool visible = EnZonaVisible(puerta.X, puerta.Y, puerta.Ancho, puerta.Alto);
+                if (puerta.Visible != visible) puerta.Visible = visible;
+            }
+            if (puntoControl != null)
+            {
+                bool visible = EnZonaVisible(puntoControl.X, puntoControl.Y, puntoControl.Ancho, puntoControl.Alto);
+                if (puntoControl.Visible != visible) puntoControl.Visible = visible;
+            }
+        }
+
+        void ActualizarPatrullas(double deltaTime)
         {
             foreach (var entrada in limitesPatrulla)
             {
                 Enemigo enemigo = entrada.Key;
-                if (!enemigo.EstaVivo) continue;
+                if (!enemigo.EstaVivo || !EnZonaVisible(enemigo.X, enemigo.Y, enemigo.Ancho, enemigo.Alto)) continue;
+                if (enemigo is CazadorPixel cazador && ActualizarCazador(cazador, deltaTime)) continue;
                 int minimo = entrada.Value.Min;
                 int maximo = entrada.Value.Max;
                 if (enemigo.X <= minimo) enemigo.CambiarDireccionPatrulla(1);
@@ -988,6 +1074,81 @@ namespace PixelEsGUI
                 else enemigo.MoverDer();
                 enemigo.Animar(Enemigo.EstadoAnimacion.Camina);
             }
+        }
+
+        // El cazador deja de patrullar al detectar al jugador y dispara una flecha a intervalos.
+        // Devuelve true mientras está en modo de ataque/alerta para no aplicar patrulla ese frame.
+        bool ActualizarCazador(CazadorPixel cazador, double deltaTime)
+        {
+            cazador.ActualizarTemporizadores(deltaTime);
+            int deltaX = jugador.X - cazador.X;
+            int deltaY = jugador.Y - cazador.Y;
+            bool detectado = Math.Abs(deltaX) <= cazador.RangoDeteccion && Math.Abs(deltaY) <= 105;
+            if (!detectado) return false;
+
+            cazador.CambiarDireccionPatrulla(deltaX < 0 ? -1 : 1);
+            if (cazador.EstaEnAnimacionAtaque)
+            {
+                cazador.Animar(Enemigo.EstadoAnimacion.Ataca);
+                return true;
+            }
+
+            if (cazador.PuedeDisparar)
+            {
+                cazador.IniciarAtaque();
+                CrearFlechaCazador(cazador);
+            }
+            else
+            {
+                cazador.Animar(Enemigo.EstadoAnimacion.Quieto);
+            }
+            return true;
+        }
+
+        void CrearFlechaCazador(CazadorPixel cazador)
+        {
+            int direccion = cazador.DireccionActual;
+            int x = direccion > 0 ? cazador.X + 70 : cazador.X + 8;
+            int y = cazador.Y + 45;
+            FlechaCazador flecha = new FlechaCazador(x, y, direccion);
+            flechasCazador.Add(flecha);
+            scene.AddItem(flecha);
+        }
+
+        void ActualizarFlechasCazador(double deltaTime)
+        {
+            double dt = Math.Clamp(deltaTime, 0, 0.05);
+            List<FlechaCazador> eliminar = new List<FlechaCazador>();
+            bool impactoConDano = false;
+            foreach (FlechaCazador flecha in flechasCazador)
+            {
+                flecha.Actualizar(dt);
+                if (flecha.Expired || flecha.X < -80 || flecha.X > AnchoNivel + 80)
+                {
+                    eliminar.Add(flecha);
+                    continue;
+                }
+
+                if (flecha.RectanguloColision.IntersectsWith(CuerpoJugador()))
+                {
+                    int vidasAntes = jugador.Vida;
+                    jugador.RecibirDano(1);
+                    eliminar.Add(flecha);
+                    if (jugador.Vida < vidasAntes)
+                    {
+                        evitoCazador = false;
+                        impactoConDano = true;
+                        break;
+                    }
+                }
+            }
+            foreach (FlechaCazador flecha in eliminar)
+            {
+                scene.RemoveItem(flecha);
+                flecha.Visible = false;
+                flechasCazador.Remove(flecha);
+            }
+            if (impactoConDano) ResolverImpacto();
         }
 
         void CambiarTecla(Keys tecla, bool presionada)
@@ -1025,7 +1186,7 @@ namespace PixelEsGUI
             ActualizarIndicadorVidas();
 
             // Los enemigos patrullan continuamente dentro de su zona.
-            ActualizarPatrullas();
+            ActualizarPatrullas(deltaTime);
 
             // Impulso y movimiento horizontal usan el mismo tiempo real.
             if (salto)
@@ -1042,10 +1203,14 @@ namespace PixelEsGUI
             // La cámara sigue al jugador y este no se sale de los bordes del nivel
             LimitarJugadorAlNivel();
             ActualizarCamara();
+            ActualizarVisibilidadCamara();
+            ActualizarFlechasCazador(deltaTime);
+            if (respawnPendiente || juegoTerminado) return;
 
             // Recoger monedas y otros coleccionables
             foreach (Coleccionables item in coleccionables)
             {
+                if (item.Recogido || Math.Abs(item.X - jugador.X) > 160 || Math.Abs(item.Y - jugador.Y) > 120) continue;
                 Rectangle rectItem = new Rectangle(item.X, item.Y, (int)item.Ancho, (int)item.Alto);
                 bool colisionColeccionable = (item is Moneda || item is Llave)
                     ? jugador.Cuerpo.IntersectsWith(rectItem)
@@ -1069,6 +1234,7 @@ namespace PixelEsGUI
             Rectangle cuerpoJugador = CuerpoJugador();
             foreach (CazadorPixel c in cazadores)
             {
+                if (Math.Abs(c.X - jugador.X) > 150 || Math.Abs(c.Y - jugador.Y) > 120) continue;
                 if (cuerpoJugador.IntersectsWith(CuerpoCazador(c)))
                 {
                     int vidasAntes = jugador.Vida;
@@ -1078,6 +1244,7 @@ namespace PixelEsGUI
             }
             foreach (GuardianPixel g in guardianes)
             {
+                if (Math.Abs(g.X - jugador.X) > 150 || Math.Abs(g.Y - jugador.Y) > 120) continue;
                 if (cuerpoJugador.IntersectsWith(CuerpoGuardian(g)))
                 {
                     int vidasAntes = jugador.Vida;
@@ -1241,6 +1408,12 @@ namespace PixelEsGUI
                 scene.RemoveItem(c);
             }
             cazadores.Clear();
+            foreach (FlechaCazador flecha in flechasCazador)
+            {
+                flecha.Visible = false;
+                scene.RemoveItem(flecha);
+            }
+            flechasCazador.Clear();
 
             foreach (Trampa t in trampas)
             {
@@ -1276,6 +1449,7 @@ namespace PixelEsGUI
 
             // La cámara vuelve al inicio del nivel
             ActualizarCamara();
+            ActualizarVisibilidadCamara();
 
             // Puerta cerca del final del nivel
             int xPuerta = AnchoNivel - 140;
@@ -1576,7 +1750,7 @@ namespace PixelEsGUI
             AgregarLlaveSobrePlataforma(1650, 3);     // LLAVE sobre plataforma
 
             AgregarGuardian(1900);                    // guardián 2
-            AgregarColeccionable(new PowerUpVelocidad(289, 0, 10), 289); // velocidad temporal
+            AgregarColeccionable(new PowerUpVelocidad(289, 0, 7), 289); // velocidad temporal
 
             AgregarCazador(2200);                     // cazador 2
 
