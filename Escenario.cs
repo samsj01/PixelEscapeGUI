@@ -19,8 +19,8 @@ namespace PixelEsGUI
         readonly List<Obstaculo> obstaculos = new List<Obstaculo>(); // tiles de terreno
         readonly List<Decoracion> decoraciones = new List<Decoracion>();
         readonly List<ObstaculoSprite> obstaculosSprite = new List<ObstaculoSprite>();
-        Puerta puerta;
-        PuntoControl puntoControl;
+        Puerta puerta = null!; // Se crea al cargar el primer nivel en el constructor.
+        PuntoControl puntoControl = null!; // Se crea al cargar el primer nivel en el constructor.
 
         // Altura del "suelo" donde se apoyan los objetos
         const int Suelo = 300;
