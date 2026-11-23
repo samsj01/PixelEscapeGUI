@@ -3,14 +3,14 @@ namespace PixelEsGUI
     // Pantallas a ventana completa (BORRADOR funcional, sin diseño visual todavía):
     public partial class Escenario
     {
-        // Paleta pastel y tipografías compartidas por todas las pantallas previas al nivel.
+        // Paleta retro y tipografías compartidas por todas las pantallas previas al nivel.
         static readonly Color ColorFondoPantalla = Color.FromArgb(49, 27, 91); // violeta retro // azul claro
         static readonly Color ColorTituloPantalla = Color.FromArgb(255, 244, 206); // marfil // morado
         static readonly Color ColorTextoPantalla = Color.FromArgb(238, 229, 255); // azul profundo
         static readonly Color ColorBotonPantalla = Color.FromArgb(255, 207, 64); // rosa pastel
         static readonly Color ColorBotonHover = Color.FromArgb(255, 225, 111);
         static readonly Color ColorBotonPresionado = Color.FromArgb(226, 170, 42);
-        static readonly Font FuenteTituloPantalla = new Font("Consolas", 34, FontStyle.Bold);
+        static readonly Font FuenteTituloPantalla = new Font("Ravie", 30, FontStyle.Regular);
         static readonly Font FuenteSubtituloPantalla = new Font("Consolas", 16, FontStyle.Bold);
         static readonly Font FuenteTextoPantalla = new Font("Consolas", 13, FontStyle.Bold);
         static readonly Font FuenteBotonPantalla = new Font("Consolas", 13, FontStyle.Bold);
@@ -116,7 +116,7 @@ namespace PixelEsGUI
             txtAlias.SetBounds(285, 280, 350, 46);
             txtAlias.Font = new Font("Consolas", 15, FontStyle.Bold);
             txtAlias.BackColor = Color.FromArgb(255, 250, 226);
-            txtAlias.ForeColor = ColorTextoPantalla;
+            txtAlias.ForeColor = Color.FromArgb(49, 27, 91);
             txtAlias.MaxLength = 40;
             txtAlias.TextAlign = HorizontalAlignment.Center;
             txtAlias.BorderStyle = BorderStyle.FixedSingle;
