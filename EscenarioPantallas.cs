@@ -10,6 +10,7 @@
         readonly Label lblPantallaSubtitulo = new Label();
         readonly Label lblPantallaTexto = new Label();
         readonly Button btnPantalla = new Button();
+        readonly Button btnContinuar = new Button();
 
         // Mientras hay una pantalla visible el juego está detenido y se ignoran P / R / movimiento.
         bool pantallaActiva = false;
@@ -55,6 +56,16 @@
                 accion();
             };
 
+            btnContinuar.Text = "CONTINUAR PARTIDA";
+            btnContinuar.Size = new Size(220, 40);
+            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 440);
+            btnContinuar.Visible = false;
+            btnContinuar.Click += (s, e) => {
+                panelPantalla.Visible = false;
+                pantallaActiva = false;
+                SolicitarContinuacion();
+            };
+            panelPantalla.Controls.Add(btnContinuar);
             panelPantalla.Controls.Add(lblPantallaTitulo);
             panelPantalla.Controls.Add(lblPantallaSubtitulo);
             panelPantalla.Controls.Add(lblPantallaTexto);
@@ -77,6 +88,7 @@
             instantePantalla = DateTime.Now;
             pantallaActiva = true;
 
+            btnContinuar.Visible = titulo == "PIXEL ESCAPE";
             panelPantalla.Visible = true;
             panelPantalla.BringToFront();
             ActiveControl = btnPantalla;
@@ -87,7 +99,7 @@
         void MostrarPantallaInicio()
         {
             MostrarPantalla("PIXEL ESCAPE", "Escapa a través de tres niveles", "", "EMPEZAR",
-                MostrarPantallaControles);
+                ComenzarNuevaPartida);
         }
 
         // 2) Pantalla de controles.
