@@ -61,8 +61,13 @@
             };
 
             btnContinuar.Text = "CONTINUAR PARTIDA";
-            btnContinuar.Size = new Size(220, 40);
-            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 440);
+            btnContinuar.Size = new Size(220, 52);
+            btnContinuar.Font = new Font("Segoe UI", 13, FontStyle.Bold);
+            btnContinuar.BackColor = Color.White;
+            btnContinuar.ForeColor = Color.FromArgb(30, 30, 30);
+            btnContinuar.FlatStyle = FlatStyle.Flat;
+            btnContinuar.FlatAppearance.BorderSize = 0;
+            btnContinuar.Location = new Point((panelPantalla.Width - btnContinuar.Width) / 2, 448);
             btnContinuar.Visible = false;
             btnContinuar.Click += (s, e) => {
                 panelPantalla.Visible = false;
