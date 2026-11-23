@@ -88,6 +88,18 @@ namespace PixelEsGUI
             Puntaje = puntos;
         }
 
+        /// <summary>Restituye vidas e inventario desde un guardado verificado.</summary>
+        public void RestaurarDatos(int vidas, int puntos, bool llave, bool escudo, bool velocidad)
+        {
+            Vida = Math.Max(0, vidas);
+            Puntaje = Math.Max(0, puntos);
+            TieneLlave = llave;
+            TieneEscudo = escudo;
+            fotogramasVelocidad = 0;
+            Velocidad = VelocidadNormal;
+            if (velocidad) ActivarVelocidadTemporal(5);
+        }
+
         public void ReiniciarPartida()
         {
             Vida = 3;
