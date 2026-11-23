@@ -1082,8 +1082,7 @@ namespace PixelEsGUI
         {
             cazador.ActualizarTemporizadores(deltaTime);
             int deltaX = jugador.X - cazador.X;
-            int deltaY = jugador.Y - cazador.Y;
-            bool detectado = Math.Abs(deltaX) <= cazador.RangoDeteccion && Math.Abs(deltaY) <= 105;
+            bool detectado = cazador.Detecta(jugador);
             if (!detectado) return false;
 
             cazador.CambiarDireccionPatrulla(deltaX < 0 ? -1 : 1);
