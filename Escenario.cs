@@ -307,40 +307,22 @@ namespace PixelEsGUI
         }
 
         /// <summary>Pide un alias para iniciar o continuar una partida.</summary>
-        string? SolicitarAlias()
-        {
-            using var dialogo = new Form {
-                Text = "Nombre del jugador", ClientSize = new Size(340, 145),
-                FormBorderStyle = FormBorderStyle.FixedDialog, StartPosition = FormStartPosition.CenterParent,
-                MaximizeBox = false, MinimizeBox = false
-            };
-            var etiqueta = new Label { Text = "Escribe tu nombre (máximo 40 caracteres):", Left = 15, Top = 15, AutoSize = true };
-            var campo = new TextBox { Left = 15, Top = 45, Width = 305, MaxLength = 40 };
-            var aceptar = new Button { Text = "Aceptar", Left = 125, Top = 95, Width = 90, DialogResult = DialogResult.OK };
-            var cancelar = new Button { Text = "Cancelar", Left = 230, Top = 95, Width = 90, DialogResult = DialogResult.Cancel };
-            dialogo.Controls.AddRange(new Control[] { etiqueta, campo, aceptar, cancelar });
-            dialogo.AcceptButton = aceptar;
-            dialogo.CancelButton = cancelar;
-            if (dialogo.ShowDialog(this) != DialogResult.OK) return null;
-            string alias = campo.Text.Trim();
-            if (alias.Length == 0) { MessageBox.Show("El nombre no puede estar vacío."); return null; }
-            return alias;
-        }
-
         void ComenzarNuevaPartida()
         {
-            string? alias = SolicitarAlias();
-            if (alias == null) { MostrarPantallaInicio(); return; }
-            nombreJugador = alias;
-            ReiniciarPartidaCompleta();
-            MostrarPantallaControles();
+            MostrarPantallaAlias(false);
         }
 
         void SolicitarContinuacion()
         {
-            string? alias = SolicitarAlias();
-            if (alias == null) { MostrarPantallaInicio(); return; }
-            ContinuarPartida(alias);
+            MostrarPantallaAlias(true);
+        }
+
+        /// <summary>Comienza una partida nueva con el alias confirmado en la pantalla.</summary>
+        void IniciarPartidaConAlias(string alias)
+        {
+            nombreJugador = alias;
+            ReiniciarPartidaCompleta();
+            MostrarPantallaControles();
         }
 
         void ConfigurarInterfaz()
