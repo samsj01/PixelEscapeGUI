@@ -6,7 +6,8 @@ namespace PixelEsGUI
     internal class CazadorPixel : Enemigo
     {
         const int VelocidadCazador = 1;
-        const double RangoPorDefecto = 360;
+        const double RangoPorDefecto = 240;
+        const double ToleranciaVertical = 38;
         const double TiempoRecargaDisparo = 1.9;
         const double DuracionAnimacionDisparo = 0.62;
         double recargaRestante;
@@ -79,9 +80,11 @@ namespace PixelEsGUI
 
         public bool Detecta(Personaje objetivo)
         {
-            double deltaX = X - objetivo.X;
-            double deltaY = Y - objetivo.Y;
-            return Math.Sqrt(deltaX * deltaX + deltaY * deltaY) <= RangoDeteccion;
+            // Solo detecta al jugador en el mismo carril horizontal.
+            // Un jugador en plataformas superiores queda fuera de la línea de visión.
+            double deltaX = Math.Abs(X - objetivo.X);
+            double deltaY = Math.Abs(Y - objetivo.Y);
+            return deltaX <= RangoDeteccion && deltaY <= ToleranciaVertical;
         }
 
         protected override bool PuedeAtacar(Personaje objetivo, bool colision)

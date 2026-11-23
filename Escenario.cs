@@ -305,7 +305,11 @@ namespace PixelEsGUI
             try
             {
                 EstadoPartida? estado = repositorio.CargarPartida(alias);
-                if (estado == null) { MessageBox.Show("No hay una partida guardada para ese nombre."); return; }
+                if (estado == null)
+                {
+                    MostrarErrorContinuacion("No existe una partida guardada con ese alias.");
+                    return;
+                }
                 if (estado.NivelActual is < 1 or > 3 || estado.VidasRestantes <= 0)
                     throw new InvalidOperationException("Los datos guardados no corresponden a una partida activa.");
                 nombreJugador = estado.NombreJugador;
@@ -350,10 +354,9 @@ namespace PixelEsGUI
                 bucleJuego.Start();
                 Visor.Focus();
             }
-            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or System.IO.InvalidDataException)
             {
-                MessageBox.Show("No se pudo cargar la partida: " + ex.Message, "Persistencia");
-                MostrarPantallaInicio();
+                MostrarErrorContinuacion("No se pudo cargar: " + ex.Message);
             }
         }
 
@@ -427,7 +430,7 @@ namespace PixelEsGUI
             lblMensajeEstado.Height = 65;
             lblMensajeEstado.TextAlign = ContentAlignment.MiddleCenter;
             lblMensajeEstado.ForeColor = ColorTextoPantalla;
-            lblMensajeEstado.Font = new Font("Bradley Hand ITC", 13, FontStyle.Bold);
+            lblMensajeEstado.Font = FuenteTextoPantalla;
             lblMensajeEstado.Padding = new Padding(24, 4, 24, 4);
             lblMensajeEstado.AutoEllipsis = true;
 
@@ -1082,8 +1085,7 @@ namespace PixelEsGUI
         {
             cazador.ActualizarTemporizadores(deltaTime);
             int deltaX = jugador.X - cazador.X;
-            int deltaY = jugador.Y - cazador.Y;
-            bool detectado = Math.Abs(deltaX) <= cazador.RangoDeteccion && Math.Abs(deltaY) <= 105;
+            bool detectado = cazador.Detecta(jugador);
             if (!detectado) return false;
 
             cazador.CambiarDireccionPatrulla(deltaX < 0 ? -1 : 1);
