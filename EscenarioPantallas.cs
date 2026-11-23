@@ -168,7 +168,7 @@ namespace PixelEsGUI
             bool esAlias = txtAlias.Visible;
             lblPantallaTitulo.SetBounds(25, Math.Max(22, h / 9), Math.Max(1, w - 50), 78);
             lblPantallaSubtitulo.SetBounds(35, Math.Max(95, h / 9 + 78), Math.Max(1, w - 70), 44);
-            lblPantallaTexto.SetBounds(80, Math.Max(154, h / 3 - 2), Math.Max(1, w - 160), esAlias ? 65 : 145);
+            lblPantallaTexto.SetBounds(80, esAlias ? Math.Max(140, h / 3 - 15) : Math.Max(154, h / 3 - 2), Math.Max(1, w - 160), esAlias ? 65 : 145);
             int ancho = Math.Min(320, Math.Max(200, w - 100));
             int x = (w - ancho) / 2;
             btnPantalla.Size = new Size(ancho, 58);
@@ -191,6 +191,7 @@ namespace PixelEsGUI
                 btnPantalla.Location = new Point(x, h - 110);
             spriteMenu.SetBounds(Math.Max(10, w - 154), Math.Max(162, h / 2 - 15), 104, 104);
             spriteMenu.Visible = !esAlias;
+            panelPantalla.Invalidate();
         }
 
         // Decoración pixel-art sencilla sin añadir archivos externos ni alterar el motor 2D.
@@ -270,7 +271,6 @@ namespace PixelEsGUI
             lblErrorAlias.BringToFront();
             btnVolverAlias.BringToFront();
             txtAlias.Focus();
-            ActualizarDisenoPantalla();
         }
 
         void ConfirmarAlias()
