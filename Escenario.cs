@@ -36,6 +36,7 @@ namespace PixelEsGUI
         readonly Stopwatch relojSalto = new Stopwatch();
         readonly RepositorioJuegoSqlite repositorio = new();
         readonly Button btnGuardar = new Button();
+        readonly Button btnVolverInicio = new Button();
         string nombreJugador = "";
         double tiempoPartidaSegundos;
         int monedasTotales;
@@ -76,7 +77,7 @@ namespace PixelEsGUI
             Visor.Dock = DockStyle.Fill;
 
             ConfigurarInterfaz();
-            ConfigurarBotonGuardar();
+            ConfigurarBotonesPausa();
             ConfigurarPantallas(); // pantallas de inicio, controles y cambio de nivel (EscenarioPantallas.cs)
 
             jugador = new Jugador(100, Suelo - 88);
@@ -206,21 +207,50 @@ namespace PixelEsGUI
             }
         }
 
-        void ConfigurarBotonGuardar()
+        void ConfigurarBotonesPausa()
         {
             btnGuardar.Text = "Guardar partida";
-            btnGuardar.Size = new Size(190, 36);
-            btnGuardar.Location = new Point((panelEstado.Width - btnGuardar.Width) / 2, 152);
-            btnGuardar.BackColor = Color.LightSteelBlue;
+            btnGuardar.Size = new Size(260, 42);
+            btnGuardar.Location = new Point((panelEstado.Width - btnGuardar.Width) / 2, 190);
+            btnGuardar.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            btnGuardar.BackColor = Color.FromArgb(226, 235, 250);
+            btnGuardar.ForeColor = Color.FromArgb(25, 35, 55);
+            btnGuardar.FlatStyle = FlatStyle.Flat;
             btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
             btnGuardar.Click += (s, ev) => GuardarPartidaActual();
             panelEstado.Controls.Add(btnGuardar);
             btnGuardar.BringToFront();
+
+            btnVolverInicio.Text = "VOLVER AL INICIO";
+            btnVolverInicio.Size = new Size(260, 42);
+            btnVolverInicio.Location = new Point((panelEstado.Width - btnVolverInicio.Width) / 2, 242);
+            btnVolverInicio.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            btnVolverInicio.BackColor = Color.FromArgb(226, 235, 250);
+            btnVolverInicio.ForeColor = Color.FromArgb(25, 35, 55);
+            btnVolverInicio.FlatStyle = FlatStyle.Flat;
+            btnVolverInicio.Visible = false;
+            btnVolverInicio.Click += (s, ev) =>
+            {
+                // Si falla el guardado, permanece en pausa para no perder progreso.
+                if (!GuardarPartidaActual(false)) return;
+                pausado = false;
+                izquierda = derecha = salto = false;
+                panelEstado.Visible = false;
+                btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
+                btnVolverInicio.Visible = false;
+                bucleJuego.Stop();
+                relojSalto.Reset();
+                MostrarPantallaInicio();
+            };
+            panelEstado.Controls.Add(btnVolverInicio);
+            btnVolverInicio.BringToFront();
         }
 
-        void GuardarPartidaActual()
+        bool GuardarPartidaActual(bool mostrarConfirmacion = true)
         {
-            if (!pausado || string.IsNullOrWhiteSpace(nombreJugador)) return;
+            if (!pausado || string.IsNullOrWhiteSpace(nombreJugador)) return false;
             try
             {
                 var recogidos = new List<int>();
@@ -242,11 +272,14 @@ namespace PixelEsGUI
                     IndicesColeccionablesRecogidos = recogidos,
                     IndicesColeccionablesCheckpoint = new List<int>(indicesRecogidos)
                 });
-                MessageBox.Show("Partida guardada correctamente.", "Pixel Escape");
+                if (mostrarConfirmacion)
+                    MessageBox.Show("Partida guardada correctamente.", "Pixel Escape");
+                return true;
             }
             catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.IO.IOException or UnauthorizedAccessException or ArgumentException)
             {
                 MessageBox.Show("No se pudo guardar: " + ex.Message, "Persistencia");
+                return false;
             }
         }
 
@@ -295,6 +328,7 @@ namespace PixelEsGUI
                 pantallaActiva = false;
                 panelEstado.Visible = false;
                 btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
                 relojSalto.Restart();
                 bucleJuego.Start();
                 Visor.Focus();
@@ -358,8 +392,8 @@ namespace PixelEsGUI
             Visor.Controls.Add(lblPowerUps);
 
             // Panel amplio
-            panelEstado.Size = new Size(520, 250);
-            panelEstado.BackColor = Color.Gainsboro;
+            panelEstado.Size = new Size(520, 320);
+            panelEstado.BackColor = Color.FromArgb(241, 245, 252);
             panelEstado.BorderStyle = BorderStyle.FixedSingle;
             panelEstado.Location = new Point((ClientSize.Width - panelEstado.Width) / 2,
                                              (ClientSize.Height - panelEstado.Height) / 2);
@@ -373,7 +407,7 @@ namespace PixelEsGUI
             lblTituloEstado.Padding = new Padding(12, 8, 12, 2);
 
             lblMensajeEstado.Dock = DockStyle.Top;
-            lblMensajeEstado.Height = 105;
+            lblMensajeEstado.Height = 65;
             lblMensajeEstado.TextAlign = ContentAlignment.MiddleCenter;
             lblMensajeEstado.ForeColor = Color.FromArgb(35, 35, 35);
             lblMensajeEstado.Font = new Font("Segoe UI", 15, FontStyle.Bold);
@@ -381,9 +415,9 @@ namespace PixelEsGUI
             lblMensajeEstado.AutoEllipsis = true;
 
             btnEstado.Text = "Volver a jugar";
-            btnEstado.Size = new Size(190, 44);
-            btnEstado.Font = new Font("Segoe UI", 11, FontStyle.Bold);
-            btnEstado.Location = new Point((panelEstado.Width - btnEstado.Width) / 2, 190);
+            btnEstado.Size = new Size(260, 44);
+            btnEstado.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+            btnEstado.Location = new Point((panelEstado.Width - btnEstado.Width) / 2, 138);
             btnEstado.BackColor = Color.White;
             btnEstado.ForeColor = Color.FromArgb(30, 30, 30);
             btnEstado.FlatStyle = FlatStyle.Flat;
@@ -520,6 +554,7 @@ namespace PixelEsGUI
             transicionEnCurso = false;
             panelEstado.Visible = false;
             btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
             jugador.ReiniciarPartida();
             tiempoPartidaSegundos = 0;
             monedasTotales = 0;
@@ -548,12 +583,15 @@ namespace PixelEsGUI
                 relojSalto.Reset();
                 MostrarPanelEstado("JUEGO EN PAUSA", "Pulsa P o el botón para continuar.", "Reanudar");
                 btnGuardar.Visible = true;
+                btnVolverInicio.Visible = true;
                 btnGuardar.BringToFront();
+                btnVolverInicio.BringToFront();
             }
             else
             {
                 panelEstado.Visible = false;
                 btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
                 relojSalto.Restart();
                 bucleJuego.Start();
             }
@@ -564,6 +602,7 @@ namespace PixelEsGUI
             pausado = false;
             panelEstado.Visible = false;
             btnGuardar.Visible = false;
+            btnVolverInicio.Visible = false;
             relojSalto.Restart();
                 bucleJuego.Start();
             Visor.Focus();
