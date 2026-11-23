@@ -427,7 +427,7 @@ namespace PixelEsGUI
             lblMensajeEstado.Height = 65;
             lblMensajeEstado.TextAlign = ContentAlignment.MiddleCenter;
             lblMensajeEstado.ForeColor = ColorTextoPantalla;
-            lblMensajeEstado.Font = new Font("Bradley Hand ITC", 13, FontStyle.Bold);
+            lblMensajeEstado.Font = FuenteTextoPantalla;
             lblMensajeEstado.Padding = new Padding(24, 4, 24, 4);
             lblMensajeEstado.AutoEllipsis = true;
 
