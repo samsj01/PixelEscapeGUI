@@ -95,9 +95,23 @@ namespace PixelEsGUI.Persistencia
             var lista = new List<ResultadoPartida>();
             using var conexion = Abrir();
             using var comando = conexion.CreateCommand();
+            // Conserva el historial completo, pero expone solo el mejor intento de cada alias.
+            // COLLATE NOCASE evita duplicados por diferencias de mayúsculas/minúsculas.
             comando.CommandText = @"SELECT id_resultado,nombre_jugador,tiempo_segundos,monedas,
-                vidas_restantes,puntuacion,fecha_hora_utc,resultado FROM resultados_partida
-                ORDER BY puntuacion DESC, tiempo_segundos ASC, fecha_hora_utc ASC LIMIT $limite";
+                vidas_restantes,puntuacion,fecha_hora_utc,resultado
+                FROM (
+                    SELECT id_resultado,nombre_jugador,tiempo_segundos,monedas,
+                        vidas_restantes,puntuacion,fecha_hora_utc,resultado,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY nombre_jugador COLLATE NOCASE
+                            ORDER BY puntuacion DESC, tiempo_segundos ASC,
+                                     fecha_hora_utc ASC, id_resultado ASC
+                        ) AS fila
+                    FROM resultados_partida
+                )
+                WHERE fila = 1
+                ORDER BY puntuacion DESC, tiempo_segundos ASC, fecha_hora_utc ASC
+                LIMIT $limite";
             comando.Parameters.AddWithValue("$limite", limite);
             using var lector = comando.ExecuteReader();
             while (lector.Read())
