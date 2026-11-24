@@ -1,0 +1,36 @@
+using Engine2D;
+
+namespace PixelEsGUI
+{
+    // Tile de terreno tomado del recurso BosqueTiles (192x112 = 12x7 cuadros de 16x16).
+    // Los cuadros se dibujan al doble: 32x32 px. No se generan ni recortan sprites.
+    internal class Obstaculo : ObjetoInteractivo
+    {
+        const int ColumnasHoja = 12;
+        const int FilasHoja = 7;
+        public const int Tamano = 32;
+
+        public Obstaculo(int x, int y, int fila, int columna)
+            : base(x, y, "BosqueTiles", ColumnasHoja, FilasHoja, 1f)
+        {
+            FijarTamano(Tamano, Tamano);
+            int cuadro = fila * ColumnasHoja + columna;
+            EstablecerRangoFrames(cuadro, cuadro, false);
+        }
+
+        // Tile de otra hoja (nivel 2): celdas uniformes de columnas x filas, dibujadas a 32x32.
+        public Obstaculo(int x, int y, string recurso, int columnas, int filas, int cuadro)
+            : base(x, y, recurso, columnas, filas, 1f)
+        {
+            FijarTamano(Tamano, Tamano);
+            EstablecerRangoFrames(cuadro, cuadro, false);
+        }
+
+        // Dibuja el tile 'px' píxeles más grande (hacia derecha y abajo) para que dos tiles vecinos
+        // se solapen y no quede una línea fina por donde se vea el fondo. No cambia la colisión.
+        public void AgrandarBorde(int px)
+        {
+            FijarTamano(Tamano + px, Tamano + px);
+        }
+    }
+}
