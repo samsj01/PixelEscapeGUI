@@ -212,10 +212,8 @@ namespace PixelEsGUI
                     Resultado = tipo
                 });
                 resultadoRegistrado = true;
-                // Al perder se conserva el último guardado para poder reintentarlo con CONTINUAR PARTIDA.
-                // Solo se borra al completar el juego, cuando ya no queda nada que continuar.
-                if (tipo == "victoria")
-                    repositorio.EliminarGuardado(nombreJugador);
+                // Una partida finalizada, por victoria o derrota, ya no se puede continuar.
+                repositorio.EliminarGuardado(nombreJugador);
             }
             catch (Exception ex) when (EsErrorDePersistencia(ex))
             {
