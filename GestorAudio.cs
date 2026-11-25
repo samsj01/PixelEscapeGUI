@@ -32,6 +32,7 @@ internal sealed class GestorAudio : IDisposable
         return memoria;
     }
 
+    /// <summary>Inicia la reproducción de música de fondo.</summary>
     public void IniciarMusica()
     {
         if (cerrado) return;
@@ -52,6 +53,7 @@ internal sealed class GestorAudio : IDisposable
         }
     }
 
+    /// <summary>Pausa la música de fondo.</summary>
     public void PausarMusica()
     {
         try
@@ -65,6 +67,7 @@ internal sealed class GestorAudio : IDisposable
         }
     }
 
+    /// <summary>Reanuda la música pausada.</summary>
     public void ReanudarMusica()
     {
         try
@@ -78,6 +81,7 @@ internal sealed class GestorAudio : IDisposable
         }
     }
 
+    /// <summary>Detiene la reproducción de música.</summary>
     public void DetenerMusica()
     {
         // Cada recurso se libera por separado: si uno falla, los demás igualmente se liberan.
@@ -89,6 +93,8 @@ internal sealed class GestorAudio : IDisposable
         datosMusica = null;
     }
 
+    /// <summary>Reproduce el efecto de sonido identificado por su recurso.</summary>
+    /// <param name="nombre">Nombre del recurso asociado.</param>
     public void Efecto(string nombre)
     {
         if (cerrado) return;
@@ -132,6 +138,7 @@ internal sealed class GestorAudio : IDisposable
         }
     }
 
+    /// <summary>Libera los recursos de reproducción de audio.</summary>
     public void Dispose()
     {
         if (cerrado) return;
@@ -190,6 +197,11 @@ internal sealed class GestorAudio : IDisposable
         public override WaveFormat WaveFormat => fuente.WaveFormat;
         public override long Length => fuente.Length;
         public override long Position { get => fuente.Position; set => fuente.Position = value; }
+        /// <summary>Lee audio de la fuente y vuelve al inicio cuando termina.</summary>
+        /// <param name="buffer">Búfer de destino del audio.</param>
+        /// <param name="offset">Posición inicial de escritura en el búfer.</param>
+        /// <param name="count">Cantidad de bytes solicitados.</param>
+        /// <returns>Número de bytes leídos.</returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
             int total = 0;

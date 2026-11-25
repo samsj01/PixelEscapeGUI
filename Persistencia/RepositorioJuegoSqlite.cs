@@ -24,6 +24,7 @@ namespace PixelEsGUI.Persistencia
         /// Prepara el repositorio sin tocar el disco: la base de datos se crea la primera vez que se usa.
         /// Así el juego arranca aunque la carpeta de datos no esté disponible, y el error se informa al usarla.
         /// </summary>
+        /// <param name="ruta">Ruta opcional del archivo de base de datos.</param>
         public RepositorioJuegoSqlite(string? ruta = null)
         {
             rutaCompleta = ResolverRuta(ruta);
@@ -239,6 +240,7 @@ namespace PixelEsGUI.Persistencia
         // ---------------------------------------------------------------------------------
 
         /// <summary>Inserta un resultado sin sobrescribir los anteriores.</summary>
+        /// <param name="resultado">Datos de la partida finalizada.</param>
         public void RegistrarResultado(ResultadoPartida resultado)
         {
             if (resultado is null) throw new ArgumentNullException(nameof(resultado));
@@ -268,6 +270,8 @@ namespace PixelEsGUI.Persistencia
         }
 
         /// <summary>Devuelve el ranking de mayor a menor puntuación, desempatando por tiempo.</summary>
+        /// <param name="limite">Cantidad máxima de resultados solicitados.</param>
+        /// <returns>Resultados ordenados por la clasificación.</returns>
         public List<ResultadoPartida> ObtenerRanking(int limite = 100)
         {
             if (limite < 1 || limite > 1000)
@@ -319,6 +323,7 @@ namespace PixelEsGUI.Persistencia
         // ---------------------------------------------------------------------------------
 
         /// <summary>Guarda una sola partida por alias, reemplazando la anterior de ese jugador.</summary>
+        /// <param name="estado">Estado de partida que se almacena.</param>
         public void GuardarPartida(EstadoPartida estado)
         {
             if (estado is null) throw new ArgumentNullException(nameof(estado));
@@ -358,6 +363,8 @@ namespace PixelEsGUI.Persistencia
         /// Recupera el único guardado del jugador, o null si no existe.
         /// Lanza InvalidDataException si el guardado está dañado o contiene datos imposibles.
         /// </summary>
+        /// <param name="nombreJugador">Alias del jugador.</param>
+        /// <returns>Estado guardado o null si no existe.</returns>
         public EstadoPartida? CargarPartida(string nombreJugador)
         {
             string nombre = ValidarNombre(nombreJugador);
@@ -405,6 +412,7 @@ namespace PixelEsGUI.Persistencia
         }
 
         /// <summary>Elimina el guardado del jugador sin borrar su historial de puntuaciones.</summary>
+        /// <param name="nombreJugador">Alias del jugador.</param>
         public void EliminarGuardado(string nombreJugador)
         {
             string nombre = ValidarNombre(nombreJugador);

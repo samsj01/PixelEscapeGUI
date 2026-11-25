@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace PixelEsGUI
 {
+    /// <summary>Punto de entrada y configuración del manejo global de errores.</summary>
     internal static class Program
     {
         // Control de avalancha: si los errores se repiten sin parar se cierra de forma ordenada.

@@ -1,6 +1,7 @@
 namespace PixelEsGUI
 {
     // Enemigo básico: velocidad moderada, patrulla y ataca al contacto.
+    /// <summary>Enemigo de patrulla con animaciones de combate.</summary>
     internal class GuardianPixel : Enemigo
     {
         const int VelocidadGuardian = 1;
@@ -26,6 +27,9 @@ namespace PixelEsGUI
         const float FpsGuardia = 8f;
         const float FpsMuerte = 12f;
 
+        /// <summary>Inicializa GuardianPixel con los datos proporcionados.</summary>
+        /// <param name="x">Coordenada horizontal inicial o de destino.</param>
+        /// <param name="y">Coordenada vertical inicial o de destino.</param>
         public GuardianPixel(int x, int y) : base(x, y, "GuardianPixel", FilasHoja, FpsQuieto)
         {
             Velocidad = VelocidadGuardian;
@@ -33,10 +37,14 @@ namespace PixelEsGUI
             Animar(EstadoAnimacion.Quieto);
         }
 
+        /// <summary>Inicializa GuardianPixel con los datos proporcionados.</summary>
         public GuardianPixel() : this(0, 0)
         {
         }
 
+        /// <summary>Selecciona los fotogramas y la velocidad correspondientes al estado solicitado.</summary>
+        /// <param name="estado">Estado de animación solicitado.</param>
+        /// <returns>Configuración de fotogramas, velocidad y repetición.</returns>
         protected override Animacion ObtenerAnimacion(EstadoAnimacion estado)
         {
             switch (estado)
