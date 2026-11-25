@@ -12,7 +12,7 @@ namespace PixelEsGUI.Persistencia
     /// Todo fallo de acceso a datos se informa como <see cref="PersistenciaException"/> con un mensaje claro;
     /// los datos inválidos se rechazan con ArgumentException y los guardados dañados con InvalidDataException.
     /// </summary>
-    internal sealed class RepositorioJuegoSqlite
+    internal sealed class RepositorioJuegoSqlite : IRepositorioJuego
     {
         readonly string rutaCompleta;
         readonly string cadenaConexion;

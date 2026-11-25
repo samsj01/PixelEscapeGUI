@@ -48,7 +48,7 @@ namespace PixelEsGUI
         // Método aparte y sin inlining: si falta una librería (p. ej. Engine2D.dll), el error se produce
         // al ejecutar esto, dentro del try de Main, y no al compilar Main justo antes de entrar en él.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void EjecutarJuego() => Application.Run(new Escenario());
+        static void EjecutarJuego() => Application.Run(new Escenario(new Persistencia.RepositorioJuegoSqlite()));
 
         /// <summary>Error en un evento de la interfaz que nadie trató: se informa y el juego continúa.</summary>
         static void ManejarErrorDeInterfaz(Exception ex)

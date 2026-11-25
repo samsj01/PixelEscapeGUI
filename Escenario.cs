@@ -35,7 +35,7 @@ namespace PixelEsGUI
         bool pausado = false;
         readonly System.Windows.Forms.Timer bucleJuego = new System.Windows.Forms.Timer { Interval = 16 };
         readonly Stopwatch relojSalto = new Stopwatch();
-        readonly RepositorioJuegoSqlite repositorio = new();
+        readonly IRepositorioJuego repositorio;
         readonly GestorAudio audio = new();
         bool saltoPresionadoAnterior;
         readonly Button btnGuardar = new Button();
@@ -64,8 +64,13 @@ namespace PixelEsGUI
         string avisoTemporalPowerUp = "";
         readonly System.Windows.Forms.Timer timerAvisoPowerUp = new System.Windows.Forms.Timer { Interval = 1800 };
 
-        public Escenario()
+        public Escenario() : this(new RepositorioJuegoSqlite())
         {
+        }
+
+        internal Escenario(IRepositorioJuego repositorio)
+        {
+            this.repositorio = repositorio ?? throw new ArgumentNullException(nameof(repositorio));
 
             InitializeComponent();
             ClientSize = new Size(920, 490); // tamaño de la ventana = lo que ve la cámara
