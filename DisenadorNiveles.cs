@@ -17,6 +17,21 @@ namespace PixelEsGUI
         readonly ICollection<Rectangle> plataformas;
         readonly int nivelActual, AnchoNivel, altoVentana, Suelo;
 
+        /// <summary>Inicializa DisenadorNiveles con los datos proporcionados.</summary>
+        /// <param name="scene">Escena donde se agregan los elementos.</param>
+        /// <param name="nivelActual">Número del nivel que se construye.</param>
+        /// <param name="anchoNivel">Ancho del nivel en píxeles.</param>
+        /// <param name="altoVentana">Altura del área visible.</param>
+        /// <param name="suelo">Coordenada vertical de referencia del suelo.</param>
+        /// <param name="plataformas">Colección de rectángulos de colisión.</param>
+        /// <param name="cazadores">Lista de cazadores del nivel.</param>
+        /// <param name="guardianes">Lista de guardianes del nivel.</param>
+        /// <param name="trampas">Lista de trampas del nivel.</param>
+        /// <param name="limitesPatrulla">Límites horizontales de patrulla por enemigo.</param>
+        /// <param name="coleccionables">Lista de objetos recogibles.</param>
+        /// <param name="obstaculos">Lista de tiles del terreno.</param>
+        /// <param name="decoraciones">Lista de elementos decorativos.</param>
+        /// <param name="obstaculosSprite">Lista de obstáculos con sprite y colisión.</param>
         internal DisenadorNiveles(GraphicsScene scene, int nivelActual, int anchoNivel,
             int altoVentana, int suelo, ICollection<Rectangle> plataformas,
             List<CazadorPixel> cazadores, List<GuardianPixel> guardianes,
@@ -40,6 +55,7 @@ namespace PixelEsGUI
             this.obstaculosSprite = obstaculosSprite;
         }
 
+        /// <summary>Crea el suelo y distribuye los elementos del nivel seleccionado.</summary>
         internal void Construir()
         {
             CrearSuelo();

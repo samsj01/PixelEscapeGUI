@@ -31,6 +31,8 @@ namespace PixelEsGUI
         }
 
         /// <summary>Anota fecha, contexto, tipo, mensaje y pila de la excepción (y de sus causas internas).</summary>
+        /// <param name="contexto">Contexto en el que ocurrió el fallo.</param>
+        /// <param name="ex">Excepción que se registra o describe.</param>
         public static void Registrar(string contexto, Exception ex)
         {
             Debug.WriteLine($"[Pixel Escape] {contexto}: {ex.GetType().Name}: {ex.Message}");
@@ -57,6 +59,8 @@ namespace PixelEsGUI
         }
 
         /// <summary>Convierte una excepción en una explicación comprensible para el jugador.</summary>
+        /// <param name="ex">Excepción que se registra o describe.</param>
+        /// <returns>Descripción del error.</returns>
         public static string Describir(Exception ex) => ex switch
         {
             PersistenciaException or InvalidDataException => ex.Message, // ya redactadas para el jugador

@@ -6,6 +6,11 @@ namespace PixelEsGUI.Persistencia
     internal static class ServicioPuntuacion
     {
         /// <summary>Calcula los puntos usando monedas, vidas y tiempo de juego.</summary>
+        /// <param name="monedas">Cantidad de monedas recogidas.</param>
+        /// <param name="vidas">Cantidad de vidas restantes.</param>
+        /// <param name="segundos">Tiempo de juego en segundos.</param>
+        /// <returns>Puntuación calculada, limitada al rango no negativo de Int32.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Algún valor es negativo o el tiempo no es finito.</exception>
         public static int Calcular(int monedas, int vidas, double segundos)
         {
             if (monedas < 0)

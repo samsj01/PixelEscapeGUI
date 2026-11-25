@@ -5,6 +5,7 @@ using System.Drawing;
 namespace PixelEsGUI
 {
     // Alex Pixel: el personaje que controla el usuario.
+    /// <summary>Personaje controlado por el usuario; administra movimiento, vidas e inventario.</summary>
     internal class Jugador : Personaje
     {
         // ---------- Constantes del salto ----------
@@ -65,6 +66,9 @@ namespace PixelEsGUI
         public int FuerzaSalto => FuerzaSaltoBase;
         public double VelSalto { get; protected set; } = 7; // 7 * 4 = 28 -> sube ~98 px (antes 5 -> ~50 px)
 
+        /// <summary>Inicializa Jugador con los datos proporcionados.</summary>
+        /// <param name="x">Coordenada horizontal inicial o de destino.</param>
+        /// <param name="y">Coordenada vertical inicial o de destino.</param>
         public Jugador(int x, int y) : base(x, y, "Jugador", ColumnasHoja, FilasHoja, FpsQuieto)
         {
             Vida = 3;
@@ -76,12 +80,18 @@ namespace PixelEsGUI
         }
 
         // ---------- Acciones que disparan los coleccionables ----------
+        /// <summary>Establece el puntaje del jugador.</summary>
+        /// <param name="puntos">Cantidad de puntos.</param>
         public void EstablecerPuntaje(int puntos)
         {
             Puntaje = puntos;
         }
 
         /// <summary>Restituye vidas e inventario desde un guardado verificado.</summary>
+        /// <param name="vidas">Cantidad de vidas guardadas.</param>
+        /// <param name="llave">Indica si se guardó la llave.</param>
+        /// <param name="escudo">Indica si se guardó el escudo.</param>
+        /// <param name="velocidad">Indica si el efecto de velocidad estaba activo.</param>
         public void RestaurarDatos(int vidas, int puntos, bool llave, bool escudo, bool velocidad)
         {
             Vida = Math.Max(0, vidas);
@@ -93,6 +103,7 @@ namespace PixelEsGUI
             if (velocidad) ActivarVelocidadTemporal(5);
         }
 
+        /// <summary>Restablece vidas, puntaje y efectos para una partida nueva.</summary>
         public void ReiniciarPartida()
         {
             Vida = 3;
@@ -104,6 +115,8 @@ namespace PixelEsGUI
             Velocidad = VelocidadNormal;
         }
 
+        /// <summary>Activa el aumento temporal de velocidad.</summary>
+        /// <param name="duracionSegundos">Duración solicitada del efecto en segundos.</param>
         public void ActivarVelocidadTemporal(int duracionSegundos)
         {
             if (fotogramasVelocidad <= 0)
@@ -122,23 +135,29 @@ namespace PixelEsGUI
             }
         }
 
+        /// <summary>Incrementa el puntaje acumulado.</summary>
+        /// <param name="puntos">Cantidad de puntos.</param>
         public void SumarPuntos(int puntos)
         {
             Puntaje += puntos;
         }
 
+        /// <summary>Registra que el jugador posee la llave.</summary>
         public void RecogerLlave()
         {
             TieneLlave = true;
         }
 
         // El escudo absorbe UN impacto: no se pierde vida y el nivel no se reinicia.
+        /// <summary>Activa la protección contra un impacto.</summary>
         public void ActivarEscudo()
         {
             TieneEscudo = true;
         }
 
         // true si el impacto queda absorbido (invulnerable o escudo). El escudo se gasta al absorber.
+        /// <summary>Comprueba la protección y consume el escudo si corresponde.</summary>
+        /// <returns>True si el impacto queda absorbido.</returns>
         public bool AbsorbeImpacto()
         {
             if (Invulnerable)
@@ -154,6 +173,8 @@ namespace PixelEsGUI
             return false;
         }
 
+        /// <summary>Procesa el daño recibido y la reacción correspondiente al personaje.</summary>
+        /// <param name="dano">Cantidad de daño recibido.</param>
         public override void RecibirDano(int dano)
         {
             if (AbsorbeImpacto())
@@ -190,6 +211,9 @@ namespace PixelEsGUI
 
         //Para perder la llave cuando el jugador muere, se reinicia el juego y pierde la llave que tenía, tambien para cuando inicia un nuevo nivel, se reinicia el juego y pierde la llave que tenía
 
+        /// <summary>Restablece posición, salto e inventario para el reinicio del nivel.</summary>
+        /// <param name="x">Coordenada horizontal inicial o de destino.</param>
+        /// <param name="y">Coordenada vertical inicial o de destino.</param>
         public void ReiniciarEstado(int x, int y)
         {
             // Reiniciar llave y escudo
@@ -226,6 +250,8 @@ namespace PixelEsGUI
         // En el aire el desplazamiento lo controla el salto; en el suelo se mueve normal
         // y se recuerda la dirección para decidir el tipo de salto.
         // Si el paso lo metería dentro de una plataforma, se deshace (los bloques no se atraviesan de lado).
+        /// <summary>Intenta desplazar al jugador a la izquierda y revierte la posición si hay colisión.</summary>
+        /// <returns>Resultado del movimiento base; la posición puede revertirse por colisión.</returns>
         public override bool MoverIzq()
         {
             movimientoHorizontal = 3;
@@ -238,6 +264,8 @@ namespace PixelEsGUI
             return seMovio;
         }
 
+        /// <summary>Intenta desplazar al jugador a la derecha y revierte la posición si hay colisión.</summary>
+        /// <returns>Resultado del movimiento base; la posición puede revertirse por colisión.</returns>
         public override bool MoverDer()
         {
             movimientoHorizontal = 3;
@@ -252,6 +280,9 @@ namespace PixelEsGUI
 
         // Caminar y saltar usan la misma velocidad base y el mismo deltaTime.
         // El power-up duplica solo la velocidad al caminar.
+        /// <summary>Desplaza al jugador según la dirección y el tiempo transcurrido, respetando colisiones.</summary>
+        /// <param name="direccion">Dirección horizontal del movimiento.</param>
+        /// <param name="deltaTime">Tiempo transcurrido en segundos.</param>
         public void MoverHorizontal(int direccion, double deltaTime)
         {
             if (direccion == 0) return;
@@ -285,12 +316,14 @@ namespace PixelEsGUI
         }
 
         // Se llama cuando otra parte del escenario corrige X (por ejemplo, límites del nivel).
+        /// <summary>Sincroniza la posición horizontal acumulada con la posición actual.</summary>
         public void SincronizarPosicionHorizontal() => posicionHorizontalAire = X;
 
         // ---------- Salto ----------
         // Orden esperado en cada fotograma: MoverIzq/MoverDer -> Saltar -> Aterrizar.
         // - Si en este fotograma se movió a un lado: salto parabólico (60°).
         // - Si no se movió: salto vertical (90°, la X no cambia).
+        /// <summary>Inicia el salto si el jugador está apoyado.</summary>
         public void Saltar()
         {
             if (!EnElSuelo)
@@ -306,6 +339,8 @@ namespace PixelEsGUI
 
         // Avanza la física vertical usando segundos reales; la velocidad positiva indica subida.
         // Se parte el paso cuando alcanza la cima para mantener las dos gravedades exactas.
+        /// <summary>Actualiza la física vertical, las colisiones y los efectos temporales.</summary>
+        /// <param name="deltaTime">Tiempo transcurrido en segundos.</param>
         public void Aterrizar(double deltaTime)
         {
             ActualizarInvulnerabilidad();

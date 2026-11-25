@@ -1,6 +1,7 @@
 namespace PixelEsGUI
 {
     // Suma puntos al jugador.
+    /// <summary>Coleccionable que incrementa el puntaje.</summary>
     internal class Moneda : Coleccionables
     {
         // ---------- Hoja de sprites (Resources/monedaaa.png, recurso "Moneda") ----------
@@ -16,6 +17,10 @@ namespace PixelEsGUI
 
         public int Valor { get; }
 
+        /// <summary>Inicializa Moneda con los datos proporcionados.</summary>
+        /// <param name="x">Coordenada horizontal inicial o de destino.</param>
+        /// <param name="y">Coordenada vertical inicial o de destino.</param>
+        /// <param name="valor">Puntos otorgados por la moneda.</param>
         public Moneda(int x, int y, int valor = 100) : base(x, y, "Moneda", ColumnasHoja, FilasHoja, Fps)
         {
             Valor = valor;
@@ -23,6 +28,8 @@ namespace PixelEsGUI
             EstablecerRangoFrames(PrimerCuadro, UltimoCuadro, true); // gira en bucle
         }
 
+        /// <summary>Aplica al jugador el efecto específico del coleccionable.</summary>
+        /// <param name="jugador">Jugador que interactúa con el objeto.</param>
         protected override void AplicarEfecto(Jugador jugador)
         {
             jugador.SumarPuntos(Valor);

@@ -4,6 +4,7 @@ using PixelEsGUI.Persistencia;
 
 namespace PixelEsGUI
 {
+    /// <summary>Formulario que coordina la partida, la interfaz y el ciclo de juego.</summary>
     public partial class Escenario : Form
     {
         GraphicsScene scene;
@@ -64,6 +65,7 @@ namespace PixelEsGUI
         string avisoTemporalPowerUp = "";
         readonly System.Windows.Forms.Timer timerAvisoPowerUp = new System.Windows.Forms.Timer { Interval = 1800 };
 
+        /// <summary>Inicializa Escenario con los datos proporcionados.</summary>
         public Escenario()
         {
 
